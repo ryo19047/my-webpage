@@ -808,10 +808,17 @@
 
     .tag-chip button {
       border: none;
-      background: transparent;
+      background: rgba(0, 0, 0, 0.2);
       color: inherit;
       cursor: pointer;
-      font-size: 1rem;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      line-height: 1;
     }
 
     .tag-empty {
@@ -1939,9 +1946,7 @@
     renderPersonalStats();
     renderPersonalShelves();
     renderSelectedTags();
-  </script>
-</body>
-</html>
+
     function addCustomTag(tag) {
       const normalized = tag.startsWith('#') ? tag : `#${tag}`;
       if (!selectedTags.includes(normalized)) {
@@ -1949,3 +1954,6 @@
         renderSelectedTags();
       }
     }
+  </script>
+</body>
+</html>

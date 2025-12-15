@@ -1806,9 +1806,13 @@
           return;
         }
 
+        const normalizedIsbn = (selectedBook.id || '')
+          .replace(/[^0-9Xx]/g, '')
+          .slice(0, 13);
+        const isbnTag = normalizedIsbn ? `#ISBN:${normalizedIsbn}` : '#ISBN:UNKNOWN';
         const reviewTags = [
           ...selectedTags,
-          `#ISBN:${selectedBook.id}`,
+          isbnTag,
           '#ユーザー投稿'
         ];
 

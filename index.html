@@ -1257,36 +1257,42 @@
     const localCatalog = [
       {
         id: '9784309226710',
+        isbn: '9784309226710',
         title: 'サピエンス全史',
         author: 'ユヴァル・ノア・ハラリ',
         publisher: '河出書房新社'
       },
       {
         id: '9784103132125',
+        isbn: '9784103132125',
         title: '金閣寺',
         author: '三島由紀夫',
         publisher: '新潮社'
       },
       {
         id: '9784102020133',
+        isbn: '9784102020133',
         title: '罪と罰',
         author: 'フョードル・ドストエフスキー',
         publisher: '新潮社'
       },
       {
         id: '9784103534226',
+        isbn: '9784103534226',
         title: 'ノルウェイの森',
         author: '村上春樹',
         publisher: '講談社'
       },
       {
         id: '9784000265861',
+        isbn: '9784000265861',
         title: '1Q84',
         author: '村上春樹',
         publisher: '新潮社'
       },
       {
         id: '9784101104216',
+        isbn: '9784101104216',
         title: '人間失格',
         author: '太宰治',
         publisher: '新潮社'
@@ -1294,6 +1300,26 @@
     ];
 
     let searchAbortController = null;
+
+    function normalizeIsbn(value = '') {
+      return value.replace(/[^0-9Xx]/g, '').toUpperCase();
+    }
+
+    function pickIsbn(identifiers = []) {
+      const byType = (type) => identifiers.find(entry => entry.type === type && normalizeIsbn(entry.identifier).length);
+      const isbn13 = byType('ISBN_13');
+      if (isbn13) {
+        const normalized = normalizeIsbn(isbn13.identifier);
+        if (normalized.length === 13) return normalized;
+      }
+      const isbn10 = byType('ISBN_10');
+      if (isbn10) {
+        const normalized = normalizeIsbn(isbn10.identifier);
+        if (normalized.length === 10) return normalized;
+      }
+      const fallback = identifiers.map(entry => normalizeIsbn(entry.identifier)).find(code => code.length >= 10);
+      return fallback || '';
+    }
 
     function resetSearchState() {
       selectedBook = null;
@@ -1311,6 +1337,7 @@
       button.dataset.bookTitle = book.title || '';
       button.dataset.bookAuthor = book.author || '';
       button.dataset.bookPublisher = book.publisher || '';
+      button.dataset.bookIsbn = book.isbn || '';
       button.innerHTML = `<strong>${book.title}</strong><span>${book.author || '著者情報なし'} / ${book.publisher || '出版社不明'}</span>`;
       item.appendChild(button);
       return item;
@@ -1379,9 +1406,11 @@
       const items = (data.items || []).map(item => {
         const info = item.volumeInfo || {};
         const identifiers = info.industryIdentifiers || [];
-        const isbn = identifiers.find(id => id.type && id.identifier)?.identifier || item.id;
+        const isbn = pickIsbn(identifiers);
+        const fallbackId = normalizeIsbn(item.id) || item.id;
         return {
-          id: isbn,
+          id: fallbackId,
+          isbn,
           title: info.title || 'タイトル不明',
           author: Array.isArray(info.authors) ? info.authors.join(' / ') : '著者情報なし',
           publisher: info.publisher || '出版社不明'
@@ -1452,7 +1481,8 @@
           id: button.dataset.bookId,
           title: button.dataset.bookTitle,
           author: button.dataset.bookAuthor,
-          publisher: button.dataset.bookPublisher
+          publisher: button.dataset.bookPublisher,
+          isbn: button.dataset.bookIsbn
         };
         if (!book.title) return;
         selectedBook = book;
@@ -1806,13 +1836,13 @@
           return;
         }
 
-        const normalizedIsbn = (selectedBook.id || '')
-          .replace(/[^0-9Xx]/g, '')
-          .slice(0, 13);
-        const isbnTag = normalizedIsbn ? `#ISBN:${normalizedIsbn}` : '#ISBN:UNKNOWN';
+        const normalizedIsbn = normalizeIsbn(selectedBook.isbn || selectedBook.id);
+        const isbnTags = (normalizedIsbn.length === 10 || normalizedIsbn.length === 13)
+          ? [`#ISBN:${normalizedIsbn}`]
+          : [];
         const reviewTags = [
           ...selectedTags,
-          isbnTag,
+          ...isbnTags,
           '#ユーザー投稿'
         ];
 

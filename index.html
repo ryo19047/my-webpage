@@ -241,12 +241,12 @@
     }
 
     .view {
-      display: grid;
+      display: none;
       gap: 2rem;
     }
 
-    .view[hidden] {
-      display: none;
+    .view.is-active {
+      display: grid;
     }
 
     .section-heading {
@@ -930,7 +930,7 @@
       <button type="button" data-view-button="mypage" id="tab-mypage" role="tab" aria-controls="view-mypage" aria-selected="false" tabindex="-1">マイページ</button>
     </nav>
 
-    <div class="view" data-view-panel="sns" id="view-sns" role="tabpanel" aria-labelledby="tab-sns">
+    <div class="view is-active" data-view-panel="sns" id="view-sns" role="tabpanel" aria-labelledby="tab-sns">
       <div class="grid">
         <section class="panel">
           <h2>最新レビュー</h2>
@@ -979,7 +979,7 @@
       </div>
     </div>
 
-    <div class="view" data-view-panel="ranking" id="view-ranking" role="tabpanel" aria-labelledby="tab-ranking" hidden>
+    <div class="view" data-view-panel="ranking" id="view-ranking" role="tabpanel" aria-labelledby="tab-ranking">
       <section class="panel ranking-panel">
         <div class="section-heading">
           <span>ランキング</span>
@@ -1022,7 +1022,7 @@
       </section>
     </div>
 
-    <div class="view" data-view-panel="mypage" id="view-mypage" role="tabpanel" aria-labelledby="tab-mypage" hidden>
+    <div class="view" data-view-panel="mypage" id="view-mypage" role="tabpanel" aria-labelledby="tab-mypage">
       <section class="panel mypage-panel">
         <div class="section-heading">
           <span>マイページ</span>
@@ -1470,7 +1470,7 @@
     function activateView(target) {
       viewPanels.forEach(panel => {
         const isActive = panel.dataset.viewPanel === target;
-        panel.toggleAttribute('hidden', !isActive);
+        panel.classList.toggle('is-active', isActive);
       });
 
       viewButtons.forEach(button => {

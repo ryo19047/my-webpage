@@ -18,6 +18,7 @@
       --accent: #8b7bff;
       --accent-2: #ffce57;
       --border: rgba(255, 255, 255, 0.12);
+      --comment-bg: rgba(255, 255, 255, 0.05);
     }
 
     * {
@@ -89,28 +90,23 @@
       font-size: 1.1rem;
       color: var(--muted);
       line-height: 1.8;
-      margin: 1rem 0 0;
+      margin: 1rem 0 1.5rem;
     }
 
-    .stats {
-      margin-top: 2rem;
+    .policies {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1rem;
     }
 
-    .stats li {
-      list-style: none;
-      padding: 1rem 1.25rem;
+    .policy-card {
       border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(0, 0, 0, 0.15);
-    }
-
-    .stats strong {
-      font-size: 1.5rem;
-      display: block;
-      font-family: "Space Grotesk", sans-serif;
+      background: rgba(0, 0, 0, 0.18);
+      padding: 1rem 1.25rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
     }
 
     .grid {
@@ -135,6 +131,70 @@
       letter-spacing: 0.02em;
     }
 
+    .panel small {
+      color: var(--muted);
+    }
+
+    .book-search {
+      margin-bottom: 1rem;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .book-search label {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .book-search input {
+      width: 100%;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 0.75rem 1.1rem;
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .search-results {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .search-results button {
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+    }
+
+    .search-results button strong {
+      display: block;
+      font-size: 1rem;
+    }
+
+    .search-results button span {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .search-status {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
     .feed {
       display: flex;
       flex-direction: column;
@@ -147,7 +207,7 @@
       background: rgba(255, 255, 255, 0.03);
       padding: 1.5rem;
       display: grid;
-      gap: 0.65rem;
+      gap: 0.85rem;
     }
 
     .review-card header {
@@ -208,6 +268,84 @@
       color: var(--muted);
     }
 
+    .comments {
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: var(--comment-bg);
+      padding: 1rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .comments h4 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .comment-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .comment-list li {
+      padding: 0.65rem 0.85rem;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.15);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .comment-list strong {
+      display: block;
+      color: var(--accent-2);
+      margin-bottom: 0.2rem;
+    }
+
+    .comment-form {
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .comment-form label {
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .comment-form input,
+    .comment-form textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.15);
+      color: var(--text);
+      font: inherit;
+      padding: 0.65rem 0.85rem;
+      resize: none;
+    }
+
+    .comment-form textarea {
+      min-height: 90px;
+    }
+
+    .comment-form button {
+      justify-self: start;
+      border: none;
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: "Space Grotesk", sans-serif;
+      color: #05030c;
+      background: linear-gradient(120deg, #ffce57, #8b7bff);
+      cursor: pointer;
+    }
+
     form {
       display: grid;
       gap: 1rem;
@@ -220,7 +358,8 @@
       color: var(--muted);
     }
 
-    input, textarea {
+    input,
+    textarea {
       width: 100%;
       border-radius: 16px;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -322,63 +461,35 @@
     <section class="hero">
       <div class="hero-label">Night Shelf / Review SNS</div>
       <h1>匿名でつなぐ<span>書評</span>コミュニティ</h1>
-      <p>Night Shelfは、ハンドルネームや匿名のままで気軽に本を追加し、5段階の星評価と感想をシェアできるソーシャルスペース。好きな時間に読み終わった余熱を、そのまま投稿していこう。</p>
-      <ul class="stats">
-        <li><strong>12,480</strong><span>レビュー</span></li>
-        <li><strong>5,209</strong><span>参加ユーザー</span></li>
-        <li><strong>742</strong><span>今週の追加冊数</span></li>
-      </ul>
+      <p>Night Shelfは、読んだ人の一次体験だけを共有するスペース。推測や引用元不明の情報は流さず、読了の温度を事実とともに残していきます。</p>
+      <div class="policies">
+        <div class="policy-card">引用・要約は必ず原著を確認してから投稿。根拠のない断言や噂話は書かないこと。</div>
+        <div class="policy-card">書誌情報はISBNなど一次ソースでセルフチェック。誤情報を見つけたらコメントで貢献しよう。</div>
+        <div class="policy-card">AI生成文や広告は不可。1レビュー1感想というシンプルなルールを守ります。</div>
+      </div>
     </section>
 
     <div class="grid">
       <section class="panel">
         <h2>最新レビュー</h2>
-        <div id="review-feed" class="feed">
-          <article class="review-card">
-            <header>
-              <h3>サピエンス全史</h3>
-              <div class="stars" aria-label="評価 5 / 5"><span style="--fill:100%">★★★★★</span>★★★★★</div>
-            </header>
-            <div class="alias">anonymous • 23:15</div>
-            <p>認知革命から貨幣・国家までを同じ視点で語る大胆さが好き。章ごとに止めても心がざわつく。</p>
-            <div class="tags">
-              <div class="tag">#歴史</div>
-              <div class="tag">#長編</div>
-            </div>
-          </article>
-          <article class="review-card">
-            <header>
-              <h3>金閣寺</h3>
-              <div class="stars" aria-label="評価 4 / 5"><span style="--fill:80%">★★★★★</span>★★★★★</div>
-            </header>
-            <div class="alias">midnight-reader • 01:02</div>
-            <p>言葉の密度が高くてひと段落ごとに息継ぎしたくなる。美に飲み込まれていく速度が異常。</p>
-            <div class="tags">
-              <div class="tag">#日本文学</div>
-              <div class="tag">#三島由紀夫</div>
-            </div>
-          </article>
-          <article class="review-card">
-            <header>
-              <h3>罪と罰</h3>
-              <div class="stars" aria-label="評価 5 / 5"><span style="--fill:100%">★★★★★</span>★★★★★</div>
-            </header>
-            <div class="alias">匿名読者 • 昼休み</div>
-            <p>自責と救済のゆらめきが延々と続くのに、警察パートは完全にスリラー。再読ベスト3入り確定。</p>
-            <div class="tags">
-              <div class="tag">#ロシア文学</div>
-              <div class="tag">#古典</div>
-            </div>
-          </article>
-        </div>
+        <small>※ 誤情報を見つけた場合はコメント欄で根拠を添えて知らせてください。</small>
+        <div id="review-feed" class="feed" aria-live="polite"></div>
       </section>
 
       <section class="panel">
         <h2>レビューを追加</h2>
         <form id="review-form">
+          <div class="book-search">
+            <label>
+              <span>まず書名を検索して選択してください *</span>
+              <input type="search" id="book-search" placeholder="例: サピエンス全史" autocomplete="off" />
+            </label>
+            <ul id="search-results" class="search-results" aria-live="polite"></ul>
+            <p id="search-status" class="search-status"></p>
+          </div>
           <label>
             <span>本のタイトル *</span>
-            <input type="text" name="title" id="book-title" placeholder="例: 余白の散歩道" required />
+            <input type="text" name="title" id="book-title" placeholder="書名検索から自動入力" required readonly />
           </label>
           <label>
             <span>ハンドルネーム (任意)</span>
@@ -396,16 +507,16 @@
           </label>
           <label>
             <span>コメント *</span>
-            <textarea name="comment" id="book-comment" placeholder="どこが刺さったのか、どんな気分で読んだのかを書いてみよう" required></textarea>
+            <textarea name="comment" id="book-comment" placeholder="本当に心を動かしたポイントを書いてください" required></textarea>
           </label>
           <button class="submit" type="submit">レビューを投稿</button>
-          <p class="helper">※ 投稿後すぐにタイムラインへ追加されます。星評価はあとから変更できません。</p>
+          <p class="helper">※ 書誌情報に誤りがあった場合はコミュニティの判断で非公開になることがあります。</p>
           <div id="form-status" class="form-status" aria-live="polite"></div>
         </form>
       </section>
     </div>
 
-    <footer>© 2024 Night Shelf — 書評SNS</footer>
+    <footer>© 2024 Night Shelf — 読んだ人が責任を持って語る書評SNS</footer>
   </div>
 
   <script>
@@ -413,7 +524,147 @@
     const statusEl = document.getElementById('form-status');
     const feed = document.getElementById('review-feed');
     const ratingButtons = Array.from(document.querySelectorAll('[data-rating-button]'));
+    const searchInput = document.getElementById('book-search');
+    const searchResults = document.getElementById('search-results');
+    const searchStatus = document.getElementById('search-status');
+    const titleInput = document.getElementById('book-title');
     let currentRating = 0;
+    let selectedBook = null;
+
+    const catalog = [
+      {
+        id: '9784309226710',
+        title: 'サピエンス全史',
+        author: 'ユヴァル・ノア・ハラリ',
+        publisher: '河出書房新社'
+      },
+      {
+        id: '9784103132125',
+        title: '金閣寺',
+        author: '三島由紀夫',
+        publisher: '新潮社'
+      },
+      {
+        id: '9784102020133',
+        title: '罪と罰',
+        author: 'フョードル・ドストエフスキー',
+        publisher: '新潮社'
+      },
+      {
+        id: '9784103534226',
+        title: 'ノルウェイの森',
+        author: '村上春樹',
+        publisher: '講談社'
+      },
+      {
+        id: '9784000265861',
+        title: '1Q84',
+        author: '村上春樹',
+        publisher: '新潮社'
+      },
+      {
+        id: '9784101104216',
+        title: '人間失格',
+        author: '太宰治',
+        publisher: '新潮社'
+      }
+    ];
+
+    function resetSearchState() {
+      selectedBook = null;
+      titleInput.value = '';
+      if (searchInput) searchInput.value = '';
+      searchResults.innerHTML = '';
+      searchStatus.textContent = '書名を入力すると出版社・著者付きの候補が表示されます。';
+    }
+
+    function renderSearchList(keyword) {
+      const normalized = keyword.trim();
+      searchResults.innerHTML = '';
+      if (!normalized) {
+        resetSearchState();
+        return;
+      }
+
+      const matches = catalog.filter(book => {
+        const target = `${book.title}${book.author}`.toLowerCase();
+        return target.includes(normalized.toLowerCase());
+      }).slice(0, 6);
+
+      if (matches.length === 0) {
+        searchStatus.textContent = '一致する書籍が見つかりませんでした。別のキーワードを試してください。';
+        return;
+      }
+
+      matches.forEach(book => {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.bookId = book.id;
+        button.innerHTML = `<strong>${book.title}</strong><span>${book.author} / ${book.publisher}</span>`;
+        item.appendChild(button);
+        searchResults.appendChild(item);
+      });
+      searchStatus.textContent = `${matches.length}件ヒットしました。タイトルをクリックして確定してください。`;
+    }
+
+    searchInput.addEventListener('input', (event) => {
+      selectedBook = null;
+      titleInput.value = '';
+      renderSearchList(event.target.value);
+    });
+
+    searchResults.addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-book-id]');
+      if (!button) return;
+      const book = catalog.find(entry => entry.id === button.dataset.bookId);
+      if (!book) return;
+      selectedBook = book;
+      titleInput.value = book.title;
+      searchInput.value = book.title;
+      searchResults.innerHTML = '';
+      searchStatus.textContent = `${book.title}（${book.author}）を選択済み。`;
+    });
+
+    resetSearchState();
+
+    const reviews = [
+      {
+        id: generateId(),
+        title: 'サピエンス全史',
+        alias: 'anonymous',
+        rating: 5,
+        comment: '認知革命から貨幣・国家までを同じ視点で語る大胆さが好き。章ごとに止めても心がざわつく。',
+        tags: ['#歴史', '#ノンフィクション'],
+        comments: [
+          { id: generateId('c'), alias: '灯台下暗し', text: '第2部の宗教パートだけ読み直しました。比喩が鮮烈。' }
+        ]
+      },
+      {
+        id: generateId(),
+        title: '金閣寺',
+        alias: 'midnight-reader',
+        rating: 4,
+        comment: '言葉の密度が高くて一段落ごとに息継ぎしたくなる。美に飲み込まれていく速度が異常。',
+        tags: ['#日本文学', '#三島由紀夫'],
+        comments: [
+          { id: generateId('c'), alias: 'kyoto-walk', text: '終盤の独白、声に出すと余韻が長い。' }
+        ]
+      },
+      {
+        id: generateId(),
+        title: '罪と罰',
+        alias: '匿名読者',
+        rating: 5,
+        comment: '自責と救済のゆらめきが続くのに、警察パートは完全にスリラー。再読ベスト3入り確定。',
+        tags: ['#ロシア文学', '#古典'],
+        comments: []
+      }
+    ];
+
+    function generateId(prefix = 'r') {
+      return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
+    }
 
     function updateRatingUI(value) {
       currentRating = value;
@@ -430,14 +681,7 @@
       });
     });
 
-    function createReviewCard({ title, alias, comment, rating }) {
-      const article = document.createElement('article');
-      article.className = 'review-card';
-
-      const header = document.createElement('header');
-      const heading = document.createElement('h3');
-      heading.textContent = title;
-
+    function createStars(rating) {
       const stars = document.createElement('div');
       stars.className = 'stars';
       stars.setAttribute('aria-label', `評価 ${rating} / 5`);
@@ -446,23 +690,140 @@
       fill.textContent = '★★★★★';
       stars.appendChild(fill);
       stars.append('★★★★★');
+      return stars;
+    }
 
-      header.append(heading, stars);
+    function createTagElements(tags) {
+      if (!tags || tags.length === 0) return null;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'tags';
+      tags.forEach(tag => {
+        const chip = document.createElement('div');
+        chip.className = 'tag';
+        chip.textContent = tag;
+        wrapper.appendChild(chip);
+      });
+      return wrapper;
+    }
 
-      const aliasEl = document.createElement('div');
-      const timestamp = new Intl.DateTimeFormat('ja-JP', {
-        hour: '2-digit',
-        minute: '2-digit'
-      }).format(new Date());
-      aliasEl.className = 'alias';
-      aliasEl.textContent = `${alias || '匿名読者'} • ${timestamp}`;
+    function createCommentsSection(review) {
+      const container = document.createElement('div');
+      container.className = 'comments';
 
-      const commentEl = document.createElement('p');
-      commentEl.textContent = comment;
+      const heading = document.createElement('h4');
+      heading.textContent = 'コメント';
+      container.appendChild(heading);
 
-      article.append(header, aliasEl, commentEl);
+      const list = document.createElement('ul');
+      list.className = 'comment-list';
+
+      if (review.comments.length === 0) {
+        const empty = document.createElement('li');
+        const strong = document.createElement('strong');
+        strong.textContent = 'まだコメントはありません';
+        empty.appendChild(strong);
+        const span = document.createElement('span');
+        span.textContent = '最初のひと言を残しませんか？';
+        empty.appendChild(span);
+        list.appendChild(empty);
+      } else {
+        review.comments.forEach(comment => {
+          const item = document.createElement('li');
+          const strong = document.createElement('strong');
+          strong.textContent = comment.alias || '匿名コメント';
+          item.appendChild(strong);
+          const span = document.createElement('span');
+          span.textContent = comment.text;
+          item.appendChild(span);
+          list.appendChild(item);
+        });
+      }
+
+      container.appendChild(list);
+
+      const form = document.createElement('form');
+      form.className = 'comment-form';
+      form.dataset.reviewId = review.id;
+
+      const aliasField = document.createElement('label');
+      aliasField.innerHTML = '<span>名前 (任意)</span>';
+      const aliasInput = document.createElement('input');
+      aliasInput.type = 'text';
+      aliasInput.name = 'comment-alias';
+      aliasInput.placeholder = '匿名でもOK';
+      aliasField.appendChild(aliasInput);
+
+      const commentField = document.createElement('label');
+      commentField.innerHTML = '<span>コメント *</span>';
+      const commentTextarea = document.createElement('textarea');
+      commentTextarea.name = 'comment-body';
+      commentTextarea.required = true;
+      commentTextarea.placeholder = 'レビューのどこに共感したかを書いてください';
+      commentField.appendChild(commentTextarea);
+
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'submit';
+      submitBtn.textContent = 'コメントを送信';
+
+      form.append(aliasField, commentField, submitBtn);
+      container.appendChild(form);
+
+      return container;
+    }
+
+    function createReviewCard(review) {
+      const article = document.createElement('article');
+      article.className = 'review-card';
+
+      const header = document.createElement('header');
+      const heading = document.createElement('h3');
+      heading.textContent = review.title;
+      header.append(heading, createStars(review.rating));
+
+      const alias = document.createElement('div');
+      alias.className = 'alias';
+      alias.textContent = review.alias || '匿名読者';
+
+      const body = document.createElement('p');
+      body.textContent = review.comment;
+
+      article.append(header, alias, body);
+
+      const tags = createTagElements(review.tags);
+      if (tags) article.appendChild(tags);
+
+      article.appendChild(createCommentsSection(review));
       return article;
     }
+
+    function renderReviews() {
+      feed.innerHTML = '';
+      reviews.forEach(review => {
+        feed.appendChild(createReviewCard(review));
+      });
+    }
+
+    feed.addEventListener('submit', (event) => {
+      if (!event.target.classList.contains('comment-form')) return;
+      event.preventDefault();
+      const formEl = event.target;
+      const reviewId = formEl.dataset.reviewId;
+      const alias = formEl.querySelector('[name="comment-alias"]').value.trim();
+      const text = formEl.querySelector('[name="comment-body"]').value.trim();
+
+      if (!text) return;
+
+      const targetReview = reviews.find(r => r.id === reviewId);
+      if (!targetReview) return;
+
+      targetReview.comments.unshift({
+        id: generateId('c'),
+        alias,
+        text
+      });
+
+      renderReviews();
+    });
 
     form.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -475,14 +836,31 @@
         return;
       }
 
-      const card = createReviewCard({ title, alias, comment, rating: currentRating });
-      feed.prepend(card);
+      if (!selectedBook || selectedBook.title !== title) {
+        statusEl.textContent = '検索候補から書名を選択して確定してください。';
+        return;
+      }
+
+      reviews.unshift({
+        id: generateId(),
+        title,
+        alias,
+        rating: currentRating,
+        comment,
+        tags: [`#ISBN:${selectedBook.id}`, '#ユーザー投稿'],
+        comments: []
+      });
+
+      renderReviews();
 
       form.reset();
       updateRatingUI(0);
-      statusEl.textContent = '投稿しました。ナイストライ！';
+      resetSearchState();
+      statusEl.textContent = '投稿しました。確認後に公開されます。';
       setTimeout(() => (statusEl.textContent = ''), 2500);
     });
+
+    renderReviews();
   </script>
 </body>
 </html>

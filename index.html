@@ -3,10 +3,187 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Page</title>
+  <title>Vibe Coding Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050b16;
+      --bg-accent: linear-gradient(135deg, rgba(84,58,255,.9), rgba(0,200,255,.9));
+      --card-gradient: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      --text: #f2f6ff;
+      --muted: rgba(255,255,255,.65);
+      --accent: #00f5d4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(0,255,200,.15), transparent 50%),
+                  radial-gradient(circle at 80% 0%, rgba(255,0,150,.2), transparent 45%),
+                  var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    main {
+      width: min(100%, 960px);
+      background: rgba(5,11,22,.85);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 32px;
+      padding: clamp(2rem, 5vw, 4rem);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+    }
+
+    main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(0,245,212,.15), transparent 60%);
+      opacity: .8;
+      pointer-events: none;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .tagline {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .35rem .85rem;
+      border-radius: 999px;
+      font-size: .85rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,.08);
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.25rem);
+      line-height: 1.15;
+      margin: 0 0 1rem;
+    }
+
+    h1 span {
+      background: var(--bg-accent);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    p.lead {
+      font-size: 1.15rem;
+      color: var(--muted);
+      margin: 0 auto 2rem;
+      max-width: 640px;
+    }
+
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      border-radius: 999px;
+      padding: .85rem 1.75rem;
+      font-weight: 600;
+      border: none;
+      color: #050b16;
+      background: var(--accent);
+      box-shadow: 0 10px 30px rgba(0,245,212,.35);
+      text-decoration: none;
+    }
+
+    section {
+      position: relative;
+      margin-top: 3rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    article {
+      padding: 1.75rem;
+      border-radius: 24px;
+      background: var(--card-gradient);
+      border: 1px solid rgba(255,255,255,.06);
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+
+    article h2 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    article p {
+      margin: 0;
+      color: var(--muted);
+      font-size: .98rem;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      font-size: .9rem;
+      color: rgba(255,255,255,.5);
+    }
+
+    @media (max-width: 600px) {
+      main {
+        border-radius: 24px;
+      }
+
+      section {
+        margin-top: 2rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello!</h1>
-  <p>GitHub Pagesで公開するテスト</p>
+  <main>
+    <header>
+      <div class="tagline">VIBE CODING</div>
+      <h1>コードで世界を揺らす<span>.</span></h1>
+      <p class="lead">GitHub Pagesで遊びながらフロントエンドの感覚を鍛えるラボ。エッジの効いたデザインと軽快な実装で、自分だけの表現を作り出そう。</p>
+      <a class="cta" href="https://github.com/" target="_blank" rel="noreferrer">今すぐ始める →</a>
+    </header>
+
+    <section>
+      <article>
+        <h2>Atomic Design</h2>
+        <p>コンポーネント指向のUIを超軽量な構造で設計。色と余白のリズムを揃えるだけで世界観が整います。</p>
+      </article>
+      <article>
+        <h2>Micro Animations</h2>
+        <p>マウスホバーやスクロールに合わせてほんのり動く演出を追加。わずかな動きが体験に深みを与えます。</p>
+      </article>
+      <article>
+        <h2>Performance First</h2>
+        <p>CSSの工夫で余計なライブラリなしでもリッチな表現。ページを軽く保ちつつ印象的に。</p>
+      </article>
+    </section>
+
+    <footer>© 2024 Vibe Coding Studio</footer>
+  </main>
 </body>
 </html>

@@ -219,6 +219,84 @@
       color: #fff;
     }
 
+    .tsundoku {
+      margin-top: 3rem;
+      padding: 2rem clamp(1rem, 3vw, 2.5rem);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tsundoku h2 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 2.8rem);
+    }
+
+    .tsundoku p {
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.6;
+    }
+
+    .search-bar {
+      margin: 1.5rem 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .search-bar input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .stack {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .stack-card {
+      padding: 1.6rem;
+      border-radius: 22px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      min-height: 210px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: transform 200ms ease, opacity 160ms ease;
+    }
+
+    .stack-card.hidden {
+      opacity: 0.25;
+      transform: scale(0.97);
+    }
+
+    .stack-card strong {
+      font-size: 1.1rem;
+    }
+
+    .stack-card small {
+      color: var(--muted);
+    }
+
+    .stack-card p {
+      margin: 0;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
     footer {
       margin-top: 2.5rem;
       text-align: center;
@@ -291,7 +369,51 @@
       <strong>読みかけメモ:</strong> 「静かな熱狂」はあと40ページ。夜の作業前に読むと集中スイッチが入るので、コーヒー淹れてからじっくり味わう予定。
     </div>
 
+    <section class="tsundoku">
+      <h2>積読解消スペース</h2>
+      <p>読みたい熱量は十分。検索してタイトルを見つけたら、そのまま読み始める習慣づくりをここで。</p>
+      <label class="search-bar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
+        </svg>
+        <input id="book-filter" type="search" placeholder="タイトルで検索 (例: サピエンス全史)" />
+      </label>
+      <div class="stack">
+        <article class="stack-card" data-title="サピエンス全史">
+          <strong>サピエンス全史</strong>
+          <small>ユヴァル・ノア・ハラリ</small>
+          <p>ホモ・サピエンスの進化と認知革命を描く歴史書。巨大テーマなので、章ごとの区切り読みで積読解消。</p>
+        </article>
+        <article class="stack-card" data-title="金閣寺">
+          <strong>金閣寺</strong>
+          <small>三島由紀夫</small>
+          <p>美の象徴に取り憑かれた青年の内面を描く。音読したくなる日本語なので夜にゆっくり読むと没入できる。</p>
+        </article>
+        <article class="stack-card" data-title="罪と罰">
+          <strong>罪と罰</strong>
+          <small>フョードル・ドストエフスキー</small>
+          <p>ラスコーリニコフの罪悪感と救済。長編だけれど第一部の推理小説的な緊迫感で勢いがつく。</p>
+        </article>
+      </div>
+    </section>
+
     <footer>© 2024 My Private Bookshelf</footer>
   </main>
+  <script>
+    const filterInput = document.getElementById('book-filter');
+    const cards = Array.from(document.querySelectorAll('.stack-card'));
+
+    function filterBooks(value) {
+      const keyword = value.trim().toLowerCase();
+      cards.forEach(card => {
+        const title = card.dataset.title.toLowerCase();
+        const match = title.includes(keyword);
+        card.classList.toggle('hidden', keyword && !match);
+      });
+    }
+
+    filterInput.addEventListener('input', (event) => filterBooks(event.target.value));
+  </script>
 </body>
 </html>

@@ -362,10 +362,91 @@
       border-color: var(--accent-2);
     }
 
+    .mypage-intro {
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0 0 1.25rem;
+    }
+
+    .personal-note {
+      border-left: 3px solid var(--accent-2);
+      padding-left: 1rem;
+    }
+
+    .mypage-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .input-panel {
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.25);
+      padding: 1.25rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .input-panel h3 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+    }
+
+    .input-panel label {
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .input-panel input,
+    .input-panel textarea {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      font: inherit;
+      padding: 0.7rem 0.85rem;
+      resize: none;
+    }
+
+    .input-panel textarea {
+      min-height: 100px;
+    }
+
+    .input-panel button {
+      margin-top: 0.5rem;
+      justify-self: start;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-family: "Space Grotesk", sans-serif;
+      color: #05030c;
+      background: linear-gradient(120deg, #ffce57, #8b7bff);
+      cursor: pointer;
+    }
+
+    .inline-inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .form-helper {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
     .mypage-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1rem;
+      margin-top: 1.5rem;
     }
 
     .stat-card {
@@ -374,11 +455,11 @@
       border: 1px solid rgba(255, 255, 255, 0.08);
       background: rgba(255, 255, 255, 0.02);
       display: grid;
-      gap: 0.35rem;
+      gap: 0.4rem;
     }
 
     .stat-card small {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--muted);
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -387,6 +468,11 @@
     .stat-card strong {
       font-size: 1.8rem;
       font-family: "Space Grotesk", sans-serif;
+    }
+
+    .stat-card span {
+      font-size: 0.9rem;
+      color: var(--muted);
     }
 
     .shelf-list {
@@ -427,6 +513,21 @@
       display: flex;
       justify-content: space-between;
       font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .empty-state {
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .shelf-note {
+      margin: 0;
+      font-size: 0.9rem;
       color: var(--muted);
     }
 
@@ -927,49 +1028,66 @@
           <span>マイページ</span>
           <h2>自分のペースで棚を育てる</h2>
         </div>
-        <div class="mypage-grid">
-          <div class="stat-card">
-            <small>読書連続日数</small>
-            <strong>18</strong>
-            <span>ナイトモード達成まであと 12日</span>
-          </div>
-          <div class="stat-card">
-            <small>公開レビュー</small>
-            <strong>57</strong>
-            <span>レビュー草稿 3件が承認待ち</span>
-          </div>
-          <div class="stat-card">
-            <small>フォロー中の棚</small>
-            <strong>11</strong>
-            <span>文学系 6 / ノンフィクション 5</span>
-          </div>
+        <p class="mypage-intro personal-note" id="profile-note">まだメモは登録されていません。今日の読書テーマを書き残してみませんか？</p>
+        <div class="mypage-actions">
+          <form class="input-panel" id="note-form">
+            <h3>今日のメモ</h3>
+            <label>
+              <span>気になるテーマや気分</span>
+              <textarea id="note-input" placeholder="例: 旅エッセイと翻訳詩を行き来したい"></textarea>
+            </label>
+            <button type="submit">メモを更新</button>
+            <p class="form-helper" id="note-status" aria-live="polite"></p>
+          </form>
+          <form class="input-panel" id="stat-form">
+            <h3>自分の指標を追加</h3>
+            <label>
+              <span>指標タイトル *</span>
+              <input type="text" id="stat-label" placeholder="例: 読書連続日数" required />
+            </label>
+            <div class="inline-inputs">
+              <label>
+                <span>値 *</span>
+                <input type="number" id="stat-value" min="0" placeholder="例: 12" required />
+              </label>
+              <label>
+                <span>一言メモ (任意)</span>
+                <input type="text" id="stat-note" placeholder="例: 夜更かし2日め" />
+              </label>
+            </div>
+            <button type="submit">指標を保存</button>
+            <p class="form-helper" id="stat-status" aria-live="polite"></p>
+          </form>
+          <form class="input-panel" id="shelf-form">
+            <h3>自分だけの本棚</h3>
+            <label>
+              <span>本棚タイトル *</span>
+              <input type="text" id="shelf-title" placeholder="例: 深夜に読み返すエッセイ" required />
+            </label>
+            <div class="inline-inputs">
+              <label>
+                <span>登録冊数 *</span>
+                <input type="number" id="shelf-total" min="0" placeholder="例: 12" required />
+              </label>
+              <label>
+                <span>レビュー済み冊数 *</span>
+                <input type="number" id="shelf-reviewed" min="0" placeholder="例: 4" required />
+              </label>
+            </div>
+            <label>
+              <span>メモ (任意)</span>
+              <textarea id="shelf-note" placeholder="進捗や気になったポイントを書き残せます"></textarea>
+            </label>
+            <button type="submit">本棚を追加</button>
+            <p class="form-helper" id="shelf-status" aria-live="polite"></p>
+          </form>
         </div>
-        <div class="shelf-list">
-          <article class="shelf-card">
-            <h3>深夜に読み返すエッセイ</h3>
-            <div class="shelf-progress" aria-label="進捗 70%">
-              <span style="width: 70%"></span>
-            </div>
-            <div class="shelf-meta">
-              <span>登録 14冊</span>
-              <span>レビュー済み 10冊</span>
-            </div>
-          </article>
-          <article class="shelf-card">
-            <h3>翻訳で読む現代詩</h3>
-            <div class="shelf-progress" aria-label="進捗 45%">
-              <span style="width: 45%"></span>
-            </div>
-            <div class="shelf-meta">
-              <span>登録 9冊</span>
-              <span>レビュー済み 4冊</span>
-            </div>
-          </article>
-        </div>
+        <div class="mypage-grid" id="personal-stats"></div>
+        <div class="shelf-list" id="personal-shelves"></div>
       </section>
     </div>
 
-    <footer>© 2024 Night Shelf — 読んだ人が責任を持って語る書評SNS</footer>
+    <footer>© <span id="footer-year">2024</span> Night Shelf — 読んだ人が責任を持って語る書評SNS</footer>
   </div>
 
   <script>
@@ -985,8 +1103,20 @@
     const viewPanels = Array.from(document.querySelectorAll('[data-view-panel]'));
     const ideaToggle = document.getElementById('idea-toggle');
     const ideaPanel = document.getElementById('idea-panel');
+    const noteForm = document.getElementById('note-form');
+    const statForm = document.getElementById('stat-form');
+    const shelfForm = document.getElementById('shelf-form');
+    const noteDisplay = document.getElementById('profile-note');
+    const statBoard = document.getElementById('personal-stats');
+    const shelfBoard = document.getElementById('personal-shelves');
+    const noteStatus = document.getElementById('note-status');
+    const statStatus = document.getElementById('stat-status');
+    const shelfStatus = document.getElementById('shelf-status');
     let currentRating = 0;
     let selectedBook = null;
+    let userNote = '';
+    const personalStats = [];
+    const personalShelves = [];
 
     const catalog = [
       {
@@ -1265,6 +1395,78 @@
       });
     }
 
+    function createEmptyState(message) {
+      const div = document.createElement('div');
+      div.className = 'empty-state';
+      div.textContent = message;
+      return div;
+    }
+
+    function renderPersonalNote() {
+      if (!noteDisplay) return;
+      if (userNote.trim().length === 0) {
+        noteDisplay.textContent = 'まだメモは登録されていません。今日の読書テーマを書き残してみませんか？';
+        return;
+      }
+      noteDisplay.textContent = userNote;
+    }
+
+    function renderPersonalStats() {
+      if (!statBoard) return;
+      statBoard.innerHTML = '';
+      if (personalStats.length === 0) {
+        statBoard.appendChild(createEmptyState('指標がまだ登録されていません。お気に入りの追跡指標を追加しましょう。'));
+        return;
+      }
+      personalStats.forEach(stat => {
+        const card = document.createElement('div');
+        card.className = 'stat-card';
+        const label = document.createElement('small');
+        label.textContent = stat.label;
+        const value = document.createElement('strong');
+        value.textContent = stat.value;
+        card.append(label, value);
+        if (stat.note) {
+          const note = document.createElement('span');
+          note.textContent = stat.note;
+          card.appendChild(note);
+        }
+        statBoard.appendChild(card);
+      });
+    }
+
+    function renderPersonalShelves() {
+      if (!shelfBoard) return;
+      shelfBoard.innerHTML = '';
+      if (personalShelves.length === 0) {
+        shelfBoard.appendChild(createEmptyState('まだ本棚がありません。タイトルと冊数を入力して最初の棚を作成しましょう。'));
+        return;
+      }
+      personalShelves.forEach(shelf => {
+        const card = document.createElement('article');
+        card.className = 'shelf-card';
+        const heading = document.createElement('h3');
+        heading.textContent = shelf.title;
+        const progress = document.createElement('div');
+        progress.className = 'shelf-progress';
+        progress.setAttribute('aria-label', `進捗 ${shelf.percent}%`);
+        const bar = document.createElement('span');
+        bar.style.width = `${shelf.percent}%`;
+        progress.appendChild(bar);
+        const meta = document.createElement('div');
+        meta.className = 'shelf-meta';
+        meta.innerHTML = `<span>登録 ${shelf.total}冊</span><span>レビュー済み ${shelf.reviewed}冊</span>`;
+        card.append(heading, progress, meta);
+        if (shelf.note) {
+          const note = document.createElement('p');
+          note.className = 'shelf-note';
+          note.textContent = shelf.note;
+          card.appendChild(note);
+        }
+        shelfBoard.appendChild(card);
+      });
+    }
+
     function activateView(target) {
       viewPanels.forEach(panel => {
         const isActive = panel.dataset.viewPanel === target;
@@ -1367,9 +1569,95 @@
       }
     });
 
+    if (noteForm) {
+      noteForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const text = noteForm.querySelector('#note-input').value.trim();
+        userNote = text;
+        renderPersonalNote();
+        noteForm.reset();
+        if (noteStatus) {
+          noteStatus.textContent = text ? 'メモを更新しました。' : 'メモを空にしました。';
+          setTimeout(() => (noteStatus.textContent = ''), 2000);
+        }
+      });
+    }
+
+    if (statForm) {
+      statForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const labelInput = statForm.querySelector('#stat-label');
+        const valueInput = statForm.querySelector('#stat-value');
+        const noteInput = statForm.querySelector('#stat-note');
+        const label = labelInput.value.trim();
+        const value = valueInput.value.trim();
+        if (!label || value === '') {
+          if (statStatus) statStatus.textContent = '指標タイトルと値は必須です。';
+          return;
+        }
+        const entry = {
+          id: generateId('stat'),
+          label,
+          value,
+          note: noteInput.value.trim()
+        };
+        personalStats.unshift(entry);
+        renderPersonalStats();
+        statForm.reset();
+        if (statStatus) {
+          statStatus.textContent = '指標を追加しました。';
+          setTimeout(() => (statStatus.textContent = ''), 2000);
+        }
+      });
+    }
+
+    if (shelfForm) {
+      shelfForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const title = shelfForm.querySelector('#shelf-title').value.trim();
+        const total = Number(shelfForm.querySelector('#shelf-total').value);
+        const reviewed = Number(shelfForm.querySelector('#shelf-reviewed').value);
+        const note = shelfForm.querySelector('#shelf-note').value.trim();
+        if (!title || Number.isNaN(total) || Number.isNaN(reviewed)) {
+          if (shelfStatus) shelfStatus.textContent = '本棚タイトルと冊数を入力してください。';
+          return;
+        }
+        const safeTotal = Math.max(total, 0);
+        const safeReviewed = Math.min(Math.max(reviewed, 0), safeTotal);
+        const percent = safeTotal === 0 ? 0 : Math.min(100, Math.round((safeReviewed / safeTotal) * 100));
+        personalShelves.unshift({
+          id: generateId('shelf'),
+          title,
+          total: safeTotal,
+          reviewed: safeReviewed,
+          percent,
+          note
+        });
+        renderPersonalShelves();
+        shelfForm.reset();
+        if (shelfStatus) {
+          shelfStatus.textContent = '本棚を追加しました。';
+          setTimeout(() => (shelfStatus.textContent = ''), 2000);
+        }
+      });
+    }
+
+    const footerYear = document.getElementById('footer-year');
+    if (footerYear) {
+      footerYear.textContent = new Date().getFullYear();
+    }
+
+    const footerYear = document.getElementById('footer-year');
+    if (footerYear) {
+      footerYear.textContent = new Date().getFullYear();
+    }
+
     activateView('sns');
     setIdeaPanel(false);
     renderReviews();
+    renderPersonalNote();
+    renderPersonalStats();
+    renderPersonalShelves();
   </script>
 </body>
 </html>

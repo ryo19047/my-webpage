@@ -906,6 +906,27 @@
       color: var(--muted);
     }
 
+    .firebase-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .firebase-delete {
+      border: none;
+      border-radius: 999px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .firebase-delete:hover {
+      color: #ffce57;
+    }
+
     form {
       display: grid;
       gap: 1rem;
@@ -2080,7 +2101,9 @@
       serverTimestamp,
       onSnapshot,
       query,
-      orderBy
+      orderBy,
+      deleteDoc,
+      doc
     } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -2117,10 +2140,29 @@
         const li = document.createElement('li');
         const text = document.createElement('p');
         text.textContent = data.text || '';
+        const meta = document.createElement('div');
+        meta.className = 'firebase-meta';
         const time = document.createElement('time');
         const created = data.createdAt?.toDate ? data.createdAt.toDate() : null;
         time.textContent = created ? created.toLocaleString('ja-JP') : '投稿準備中...';
-        li.append(text, time);
+        meta.appendChild(time);
+        if (currentUser && data.uid === currentUser.uid) {
+          const delBtn = document.createElement('button');
+          delBtn.type = 'button';
+          delBtn.className = 'firebase-delete';
+          delBtn.textContent = '削除';
+          delBtn.addEventListener('click', async () => {
+            const ok = window.confirm('この投稿を本当に消していいですか？');
+            if (!ok) return;
+            try {
+              await deleteDoc(doc(db, 'reviews', doc.id));
+            } catch (error) {
+              console.error('削除に失敗しました', error);
+            }
+          });
+          meta.appendChild(delBtn);
+        }
+        li.append(text, meta);
         reviewList.appendChild(li);
       });
       if (snapshot.size === 0) {

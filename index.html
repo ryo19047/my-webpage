@@ -887,13 +887,31 @@
     .firebase-auth {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
+      gap: 0.75rem;
+      align-items: flex-start;
       justify-content: space-between;
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 16px;
       padding: 0.75rem 1rem;
       background: rgba(255, 255, 255, 0.03);
+    }
+
+    .firebase-auth label {
+      flex: 1;
+      min-width: 220px;
+      display: grid;
+      gap: 0.3rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .firebase-auth input {
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      font: inherit;
+      padding: 0.45rem 0.9rem;
     }
 
     .firebase-auth-actions {
@@ -942,6 +960,11 @@
       justify-content: space-between;
       align-items: center;
       gap: 1rem;
+    }
+
+    .firebase-author {
+      font-size: 0.8rem;
+      color: var(--muted);
     }
 
     .firebase-delete {
@@ -1203,19 +1226,23 @@
         </section>
       </div>
 
-      <section class="panel">
-        <div class="section-heading">
-          <span>リアルタイム投稿</span>
-          <h2>Firestoreで共有するメモ</h2>
-        </div>
-        <div class="firebase-post">
-          <div class="firebase-auth">
-            <p id="authStatus">未ログインです。投稿するにはログインしてください。</p>
-            <div class="firebase-auth-actions">
-              <button type="button" id="loginBtn">ログイン</button>
-              <button type="button" id="logoutBtn" disabled>ログアウト</button>
-            </div>
+        <section class="panel">
+          <div class="section-heading">
+            <span>リアルタイム投稿</span>
+            <h2>みんなで共有するメモ</h2>
           </div>
+          <div class="firebase-post">
+            <div class="firebase-auth">
+              <p id="authStatus">未ログインです。投稿するにはログインしてください。</p>
+              <label>
+                <span>表示名 (任意)</span>
+                <input type="text" id="loginAliasInput" placeholder="例: 夜ふかし読者" />
+              </label>
+              <div class="firebase-auth-actions">
+                <button type="button" id="loginBtn">ログイン</button>
+                <button type="button" id="logoutBtn" disabled>ログアウト</button>
+              </div>
+            </div>
           <p class="form-helper">※ 投稿者本人のみ削除できます。削除前に確認ダイアログが表示されます。</p>
           <label for="reviewText">今の読書メモを一言で共有</label>
           <textarea id="reviewText" placeholder="例: 金閣寺の描写が脳裏から離れない..."></textarea>
@@ -2128,156 +2155,187 @@
       }
     }
   </script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      addDoc,
-      serverTimestamp,
-      onSnapshot,
-      query,
-      orderBy,
-      deleteDoc,
-      doc
-    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+  <script>
+    (function () {
+      const LOCAL_POSTS_KEY = 'nightShelfRealtimePosts';
+      const LOCAL_USER_KEY = 'nightShelfRealtimeUser';
+      const reviewInput = document.getElementById('reviewText');
+      const postBtn = document.getElementById('postBtn');
+      const reviewList = document.getElementById('reviewList');
+      const loginBtn = document.getElementById('loginBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const authStatus = document.getElementById('authStatus');
+      const loginAliasInput = document.getElementById('loginAliasInput');
 
-    const firebaseConfig = {
-      // TODO: Firebaseコンソールの値を貼る
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+      let currentUser = null;
+      let realtimePosts = [];
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const reviewInput = document.getElementById('reviewText');
-    const postBtn = document.getElementById('postBtn');
-    const reviewList = document.getElementById('reviewList');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const authStatus = document.getElementById('authStatus');
-
-    let currentUser = null;
-
-    function setButtonState(isPosting) {
-      if (!postBtn) return;
-      const disabled = isPosting || !currentUser;
-      postBtn.disabled = disabled;
-      postBtn.textContent = isPosting ? '投稿中...' : '投稿して共有';
-    }
-
-    function updateAuthUI(user) {
-      currentUser = user;
-      const loggedIn = Boolean(user);
-      if (authStatus) {
-        authStatus.textContent = loggedIn
-          ? `ログイン中: ${user.uid.slice(0, 8)}...`
-          : '未ログインです。ログインすると投稿・削除できます。';
+      function loadFromStorage() {
+        try {
+          const storedPosts = JSON.parse(localStorage.getItem(LOCAL_POSTS_KEY) || '[]');
+          realtimePosts = Array.isArray(storedPosts) ? storedPosts : [];
+        } catch {
+          realtimePosts = [];
+        }
+        try {
+          const storedUser = JSON.parse(localStorage.getItem(LOCAL_USER_KEY) || 'null');
+          currentUser = storedUser && storedUser.uid ? storedUser : null;
+        } catch {
+          currentUser = null;
+        }
       }
-      if (loginBtn) loginBtn.disabled = loggedIn;
-      if (logoutBtn) logoutBtn.disabled = !loggedIn;
-      if (reviewInput) reviewInput.disabled = !loggedIn;
-      setButtonState(false);
-    }
 
-    function renderReviewList(snapshot) {
-      if (!reviewList) return;
-      reviewList.innerHTML = '';
-      snapshot.forEach(snapshotDoc => {
-        const data = snapshotDoc.data();
-        const li = document.createElement('li');
-        const text = document.createElement('p');
-        text.textContent = data.text || '';
-        const meta = document.createElement('div');
-        meta.className = 'firebase-meta';
-        const time = document.createElement('time');
-        const created = data.createdAt?.toDate ? data.createdAt.toDate() : null;
-        time.textContent = created ? created.toLocaleString('ja-JP') : '投稿準備中...';
-        meta.appendChild(time);
-        if (currentUser && data.uid === currentUser.uid) {
-          const delBtn = document.createElement('button');
-          delBtn.type = 'button';
-          delBtn.className = 'firebase-delete';
-          delBtn.textContent = '削除';
-          delBtn.addEventListener('click', async () => {
-            const ok = window.confirm('この投稿を本当に消していいですか？');
-            if (!ok) return;
-            try {
-              await deleteDoc(doc(db, 'reviews', snapshotDoc.id));
-            } catch (error) {
-              console.error('削除に失敗しました', error);
+      function persistPosts() {
+        localStorage.setItem(LOCAL_POSTS_KEY, JSON.stringify(realtimePosts));
+      }
+
+      function persistUser() {
+        if (currentUser) {
+          localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(currentUser));
+        } else {
+          localStorage.removeItem(LOCAL_USER_KEY);
+        }
+      }
+
+      function formatDate(value) {
+        try {
+          return new Date(value).toLocaleString('ja-JP');
+        } catch {
+          return '';
+        }
+      }
+
+      function updateAuthUI() {
+        const loggedIn = Boolean(currentUser);
+        if (authStatus) {
+          authStatus.textContent = loggedIn
+            ? `ログイン中: ${currentUser.alias}`
+            : '未ログインです。ログインすると投稿・削除できます。';
+        }
+        if (loginBtn) loginBtn.disabled = loggedIn;
+        if (logoutBtn) logoutBtn.disabled = !loggedIn;
+        if (reviewInput) reviewInput.disabled = !loggedIn;
+        if (postBtn) postBtn.disabled = !loggedIn;
+        if (loginAliasInput && loggedIn) {
+          loginAliasInput.value = currentUser.alias;
+        }
+      }
+
+      function renderRealtimeList() {
+        if (!reviewList) return;
+        reviewList.innerHTML = '';
+        if (realtimePosts.length === 0) {
+          const empty = document.createElement('li');
+          empty.textContent = 'まだ投稿はありません。最初のメモを残してみましょう。';
+          reviewList.appendChild(empty);
+          return;
+        }
+        const sorted = [...realtimePosts].sort((a, b) => b.createdAt - a.createdAt);
+        sorted.forEach((entry) => {
+          const li = document.createElement('li');
+          const text = document.createElement('p');
+          text.textContent = entry.text;
+          const meta = document.createElement('div');
+          meta.className = 'firebase-meta';
+          const alias = document.createElement('span');
+          alias.className = 'firebase-author';
+          alias.textContent = entry.alias;
+          const time = document.createElement('time');
+          time.dateTime = new Date(entry.createdAt).toISOString();
+          time.textContent = formatDate(entry.createdAt);
+          meta.append(alias, time);
+
+          if (currentUser && entry.uid === currentUser.uid) {
+            const delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'firebase-delete';
+            delBtn.textContent = '削除';
+            delBtn.addEventListener('click', () => handleDelete(entry.id));
+            meta.appendChild(delBtn);
+          }
+          li.append(text, meta);
+          reviewList.appendChild(li);
+        });
+      }
+
+      function handleLogin() {
+        const alias = (loginAliasInput?.value || '').trim() || '匿名メモ';
+        currentUser = { uid: generateId('user'), alias };
+        persistUser();
+        updateAuthUI();
+      }
+
+      function handleLogout() {
+        currentUser = null;
+        persistUser();
+        updateAuthUI();
+      }
+
+      function handlePost() {
+        if (!reviewInput) return;
+        const text = reviewInput.value.trim();
+        if (!text) return;
+        if (!currentUser) {
+          window.alert('投稿するにはログインしてください。');
+          return;
+        }
+        realtimePosts.unshift({
+          id: generateId('post'),
+          text,
+          createdAt: Date.now(),
+          uid: currentUser.uid,
+          alias: currentUser.alias
+        });
+        persistPosts();
+        renderRealtimeList();
+        reviewInput.value = '';
+      }
+
+      function handleDelete(postId) {
+        if (!currentUser) {
+          window.alert('自分の投稿のみ削除できます。');
+          return;
+        }
+        const index = realtimePosts.findIndex((item) => item.id === postId);
+        if (index === -1) return;
+        if (realtimePosts[index].uid !== currentUser.uid) {
+          window.alert('自分の投稿のみ削除できます。');
+          return;
+        }
+        const ok = window.confirm('この投稿を本当に消していいですか？');
+        if (!ok) return;
+        realtimePosts.splice(index, 1);
+        persistPosts();
+        renderRealtimeList();
+      }
+
+      function bindEvents() {
+        if (postBtn) {
+          postBtn.addEventListener('click', handlePost);
+        }
+        if (loginBtn) {
+          loginBtn.addEventListener('click', handleLogin);
+        }
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', handleLogout);
+        }
+        if (reviewInput) {
+          reviewInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+              handlePost();
             }
           });
-          meta.appendChild(delBtn);
         }
-        li.append(text, meta);
-        reviewList.appendChild(li);
-      });
-      if (snapshot.size === 0) {
-        const empty = document.createElement('li');
-        empty.textContent = 'まだ投稿はありません。最初のメモを残してみましょう。';
-        reviewList.appendChild(empty);
       }
-    }
 
-    async function handlePost() {
-      if (!reviewInput) return;
-      const text = reviewInput.value.trim();
-      if (!text) return;
-      if (!currentUser) {
-        window.alert('投稿するにはログインしてください。');
-        return;
+      loadFromStorage();
+      if (loginAliasInput && currentUser?.alias) {
+        loginAliasInput.value = currentUser.alias;
       }
-      setButtonState(true);
-      try {
-        await addDoc(collection(db, 'reviews'), {
-          text,
-          createdAt: serverTimestamp(),
-          uid: currentUser.uid
-        });
-        reviewInput.value = '';
-      } catch (error) {
-        console.error('投稿に失敗しました', error);
-      } finally {
-        setButtonState(false);
-      }
-    }
-
-    if (postBtn) {
-      postBtn.addEventListener('click', handlePost);
-    }
-
-    if (loginBtn) {
-      loginBtn.addEventListener('click', () => {
-        signInAnonymously(auth).catch((error) => {
-          console.error('匿名認証に失敗しました', error);
-        });
-      });
-    }
-
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        signOut(auth).catch((error) => {
-          console.error('ログアウトに失敗しました', error);
-        });
-      });
-    }
-
-    updateAuthUI(null);
-
-    onAuthStateChanged(auth, (user) => {
-      updateAuthUI(user);
-    });
-
-    const reviewsQuery = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
-    onSnapshot(reviewsQuery, renderReviewList);
+      renderRealtimeList();
+      updateAuthUI();
+      bindEvents();
+    })();
   </script>
 </body>
 </html>

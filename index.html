@@ -773,6 +773,79 @@
       cursor: pointer;
     }
 
+    .tag-input {
+      display: grid;
+      gap: 0.75rem;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .selected-tags,
+    .tag-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tag-chip {
+      border-radius: 999px;
+      padding: 0.35rem 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+    }
+
+    .tag-chip.selected {
+      background: rgba(255, 206, 87, 0.15);
+      border-color: var(--accent-2);
+      color: var(--accent-2);
+    }
+
+    .tag-chip button {
+      border: none;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .tag-empty {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .tag-custom {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tag-custom input {
+      flex: 1;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      font: inherit;
+      padding: 0.65rem 0.85rem;
+    }
+
+    .tag-custom button {
+      border-radius: 12px;
+      border: 1px solid transparent;
+      background: linear-gradient(120deg, #ffce57, #8b7bff);
+      color: #05030c;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.65rem 0.95rem;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
     form {
       display: grid;
       gap: 1rem;
@@ -991,16 +1064,34 @@
                   <button type="button" data-rating-button="4" aria-label="4星">★</button>
                   <button type="button" data-rating-button="5" aria-label="5星">★</button>
                 </div>
-              </label>
-              <label>
-                <span>コメント *</span>
-                <textarea name="comment" id="book-comment" placeholder="本当に心を動かしたポイントを書いてください" required></textarea>
-              </label>
-              <button class="submit" type="submit">レビューを投稿</button>
-              <p class="helper">※ 書誌情報に誤りがあった場合はコミュニティの判断で非公開になることがあります。</p>
-              <div id="form-status" class="form-status" aria-live="polite"></div>
-            </form>
-          </section>
+            </label>
+            <label>
+              <span>コメント *</span>
+              <textarea name="comment" id="book-comment" placeholder="本当に心を動かしたポイントを書いてください" required></textarea>
+            </label>
+            <label>
+              <span>タグ (任意)</span>
+              <div class="tag-input">
+                <div>
+                  <small>選択中</small>
+                  <div class="selected-tags" id="selected-tags"></div>
+                </div>
+                <div>
+                  <small>AI候補</small>
+                  <div class="tag-suggestions" id="tag-suggestions"></div>
+                </div>
+                <div class="tag-custom">
+                  <input type="text" id="tag-custom-input" placeholder="#カスタムタグを入力" />
+                  <button type="button" id="tag-add-button">追加</button>
+                </div>
+                <p class="form-helper" id="tag-helper">書名を選ぶとAIサジェストが表示されます。気に入ったものをクリックして選んでください。</p>
+              </div>
+            </label>
+            <button class="submit" type="submit">レビューを投稿</button>
+            <p class="helper">※ 書誌情報に誤りがあった場合はコミュニティの判断で非公開になることがあります。</p>
+            <div id="form-status" class="form-status" aria-live="polite"></div>
+          </form>
+        </section>
         </div>
       </div>
 
@@ -1138,9 +1229,15 @@
     const noteStatus = document.getElementById('note-status');
     const statStatus = document.getElementById('stat-status');
     const shelfStatus = document.getElementById('shelf-status');
+    const selectedTagsEl = document.getElementById('selected-tags');
+    const tagSuggestionsEl = document.getElementById('tag-suggestions');
+    const tagCustomInput = document.getElementById('tag-custom-input');
+    const tagAddButton = document.getElementById('tag-add-button');
     let currentRating = 0;
     let selectedBook = null;
     let userNote = '';
+    let suggestedTags = [];
+    let selectedTags = [];
     const personalStats = [];
     const personalShelves = [];
 
@@ -1193,6 +1290,16 @@
       if (searchStatus) searchStatus.textContent = '書名を入力すると出版社・著者付きの候補が表示されます。';
     }
 
+    const tagDictionary = [
+      { keywords: ['史', 'history', 'world', 'sapiens'], tags: ['#歴史', '#ノンフィクション'] },
+      { keywords: ['罪と罰', 'crime', 'justice'], tags: ['#ロシア文学', '#心理'] },
+      { keywords: ['金閣寺', 'temple'], tags: ['#日本文学', '#美学'] },
+      { keywords: ['森', '1q84', 'murakami', '村上'], tags: ['#現代文学', '#ファンタジー'] },
+      { keywords: ['エッセイ', 'essay'], tags: ['#エッセイ', '#短編集'] },
+      { keywords: ['詩', 'poetry'], tags: ['#詩集', '#翻訳'] },
+      { keywords: ['science', '未来', 'technology'], tags: ['#科学', '#未来予測'] }
+    ];
+
     function createSearchListItem(book) {
       const item = document.createElement('li');
       const button = document.createElement('button');
@@ -1204,6 +1311,82 @@
       button.innerHTML = `<strong>${book.title}</strong><span>${book.author || '著者情報なし'} / ${book.publisher || '出版社不明'}</span>`;
       item.appendChild(button);
       return item;
+    }
+
+    function getSuggestedTags(title) {
+      const normalized = title.toLowerCase();
+      const tagSet = new Set();
+      tagDictionary.forEach(entry => {
+        if (entry.keywords.some(keyword => normalized.includes(keyword.toLowerCase()))) {
+          entry.tags.forEach(tag => tagSet.add(tag));
+        }
+      });
+      if (tagSet.size === 0) {
+        tagSet.add('#読書メモ');
+        tagSet.add('#新着レビュー');
+      }
+      return Array.from(tagSet).slice(0, 6);
+    }
+
+    function renderSelectedTags() {
+      if (!selectedTagsEl) return;
+      selectedTagsEl.innerHTML = '';
+      if (selectedTags.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'tag-empty';
+        empty.textContent = 'まだタグは選択されていません。候補をクリックして追加してください。';
+        selectedTagsEl.appendChild(empty);
+        return;
+      }
+      selectedTags.forEach(tag => {
+        const chip = document.createElement('div');
+        chip.className = 'tag-chip selected';
+        chip.textContent = tag;
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.setAttribute('aria-label', `${tag}を削除`);
+        removeBtn.textContent = '×';
+        removeBtn.addEventListener('click', () => {
+          selectedTags = selectedTags.filter(entry => entry !== tag);
+          renderSelectedTags();
+        });
+        chip.appendChild(removeBtn);
+        selectedTagsEl.appendChild(chip);
+      });
+    }
+
+    function renderTagSuggestions() {
+      if (!tagSuggestionsEl) return;
+      tagSuggestionsEl.innerHTML = '';
+      if (suggestedTags.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'tag-empty';
+        empty.textContent = '書名を選択すると候補が表示されます。';
+        tagSuggestionsEl.appendChild(empty);
+        return;
+      }
+      suggestedTags.forEach(tag => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'tag-chip';
+        chip.textContent = tag;
+        chip.addEventListener('click', () => {
+          if (!selectedTags.includes(tag)) {
+            selectedTags.push(tag);
+            renderSelectedTags();
+          }
+        });
+        tagSuggestionsEl.appendChild(chip);
+      });
+    }
+
+    function updateTagSuggestions(title) {
+      if (!title) {
+        suggestedTags = [];
+      } else {
+        suggestedTags = getSuggestedTags(title);
+      }
+      renderTagSuggestions();
     }
 
     function renderSearchResults(list) {
@@ -1256,11 +1439,17 @@
 
       if (!normalized) {
         searchStatus.textContent = '書名を入力すると出版社・著者付きの候補が表示されます。';
+        suggestedTags = [];
+        renderTagSuggestions();
+        selectedTags = [];
+        renderSelectedTags();
         return;
       }
 
       if (normalized.length < 2) {
         searchStatus.textContent = 'あと1文字以上入力すると検索できます。';
+        suggestedTags = [];
+        renderTagSuggestions();
         return;
       }
 
@@ -1315,6 +1504,9 @@
         searchInput.value = book.title;
         searchResults.innerHTML = '';
         searchStatus.textContent = `${book.title}（${book.author || '著者情報なし'}）を選択済み。`;
+        selectedTags = [];
+        updateTagSuggestions(book.title);
+        renderSelectedTags();
       });
     }
 
@@ -1595,6 +1787,24 @@
       });
     });
 
+    if (tagAddButton && tagCustomInput) {
+      tagAddButton.addEventListener('click', () => {
+        const value = tagCustomInput.value.trim();
+        if (!value) return;
+        addCustomTag(value);
+        tagCustomInput.value = '';
+      });
+      tagCustomInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          const value = tagCustomInput.value.trim();
+          if (!value) return;
+          addCustomTag(value);
+          tagCustomInput.value = '';
+        }
+      });
+    }
+
     if (feed) {
       feed.addEventListener('submit', (event) => {
         if (!event.target.classList.contains('comment-form')) return;
@@ -1636,13 +1846,19 @@
           return;
         }
 
+        const reviewTags = [
+          ...selectedTags,
+          `#ISBN:${selectedBook.id}`,
+          '#ユーザー投稿'
+        ];
+
         reviews.unshift({
           id: generateId(),
           title,
           alias,
           rating: currentRating,
           comment,
-          tags: [`#ISBN:${selectedBook.id}`, '#ユーザー投稿'],
+          tags: reviewTags,
           comments: []
         });
 
@@ -1651,6 +1867,10 @@
         form.reset();
         updateRatingUI(0);
         resetSearchState();
+        selectedTags = [];
+        suggestedTags = [];
+        renderSelectedTags();
+        renderTagSuggestions();
         statusEl.textContent = '投稿しました。確認後に公開されます。';
         setTimeout(() => (statusEl.textContent = ''), 2500);
       });
@@ -1765,6 +1985,15 @@
     renderPersonalNote();
     renderPersonalStats();
     renderPersonalShelves();
+    renderSelectedTags();
+    renderTagSuggestions();
   </script>
 </body>
 </html>
+    function addCustomTag(tag) {
+      const normalized = tag.startsWith('#') ? tag : `#${tag}`;
+      if (!selectedTags.includes(normalized)) {
+        selectedTags.push(normalized);
+        renderSelectedTags();
+      }
+    }

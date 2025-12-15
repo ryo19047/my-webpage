@@ -884,6 +884,37 @@
       cursor: pointer;
     }
 
+    .firebase-auth {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .firebase-auth-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .firebase-auth button {
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      color: var(--muted);
+      padding: 0.4rem 1rem;
+      cursor: pointer;
+    }
+
+    .firebase-auth button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .firebase-list {
       margin: 1.5rem 0 0;
       padding: 0;
@@ -1178,6 +1209,14 @@
           <h2>Firestoreで共有するメモ</h2>
         </div>
         <div class="firebase-post">
+          <div class="firebase-auth">
+            <p id="authStatus">未ログインです。投稿するにはログインしてください。</p>
+            <div class="firebase-auth-actions">
+              <button type="button" id="loginBtn">ログイン</button>
+              <button type="button" id="logoutBtn" disabled>ログアウト</button>
+            </div>
+          </div>
+          <p class="form-helper">※ 投稿者本人のみ削除できます。削除前に確認ダイアログが表示されます。</p>
           <label for="reviewText">今の読書メモを一言で共有</label>
           <textarea id="reviewText" placeholder="例: 金閣寺の描写が脳裏から離れない..."></textarea>
           <button id="postBtn" type="button">投稿して共有</button>
@@ -1964,9 +2003,7 @@
         updateRatingUI(0);
         resetSearchState();
         selectedTags = [];
-        suggestedTags = [];
         renderSelectedTags();
-        renderTagSuggestions();
         statusEl.textContent = '投稿しました。確認後に公開されます。';
         setTimeout(() => (statusEl.textContent = ''), 2500);
       });
@@ -2093,7 +2130,7 @@
   </script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import {
       getFirestore,
       collection,
@@ -2123,20 +2160,38 @@
     const reviewInput = document.getElementById('reviewText');
     const postBtn = document.getElementById('postBtn');
     const reviewList = document.getElementById('reviewList');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const authStatus = document.getElementById('authStatus');
 
     let currentUser = null;
 
     function setButtonState(isPosting) {
       if (!postBtn) return;
-      postBtn.disabled = isPosting;
+      const disabled = isPosting || !currentUser;
+      postBtn.disabled = disabled;
       postBtn.textContent = isPosting ? '投稿中...' : '投稿して共有';
+    }
+
+    function updateAuthUI(user) {
+      currentUser = user;
+      const loggedIn = Boolean(user);
+      if (authStatus) {
+        authStatus.textContent = loggedIn
+          ? `ログイン中: ${user.uid.slice(0, 8)}...`
+          : '未ログインです。ログインすると投稿・削除できます。';
+      }
+      if (loginBtn) loginBtn.disabled = loggedIn;
+      if (logoutBtn) logoutBtn.disabled = !loggedIn;
+      if (reviewInput) reviewInput.disabled = !loggedIn;
+      setButtonState(false);
     }
 
     function renderReviewList(snapshot) {
       if (!reviewList) return;
       reviewList.innerHTML = '';
-      snapshot.forEach(doc => {
-        const data = doc.data();
+      snapshot.forEach(snapshotDoc => {
+        const data = snapshotDoc.data();
         const li = document.createElement('li');
         const text = document.createElement('p');
         text.textContent = data.text || '';
@@ -2155,7 +2210,7 @@
             const ok = window.confirm('この投稿を本当に消していいですか？');
             if (!ok) return;
             try {
-              await deleteDoc(doc(db, 'reviews', doc.id));
+              await deleteDoc(doc(db, 'reviews', snapshotDoc.id));
             } catch (error) {
               console.error('削除に失敗しました', error);
             }
@@ -2175,7 +2230,11 @@
     async function handlePost() {
       if (!reviewInput) return;
       const text = reviewInput.value.trim();
-      if (!text || !currentUser) return;
+      if (!text) return;
+      if (!currentUser) {
+        window.alert('投稿するにはログインしてください。');
+        return;
+      }
       setButtonState(true);
       try {
         await addDoc(collection(db, 'reviews'), {
@@ -2195,12 +2254,26 @@
       postBtn.addEventListener('click', handlePost);
     }
 
-    signInAnonymously(auth).catch((error) => {
-      console.error('匿名認証に失敗しました', error);
-    });
+    if (loginBtn) {
+      loginBtn.addEventListener('click', () => {
+        signInAnonymously(auth).catch((error) => {
+          console.error('匿名認証に失敗しました', error);
+        });
+      });
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        signOut(auth).catch((error) => {
+          console.error('ログアウトに失敗しました', error);
+        });
+      });
+    }
+
+    updateAuthUI(null);
 
     onAuthStateChanged(auth, (user) => {
-      currentUser = user;
+      updateAuthUI(user);
     });
 
     const reviewsQuery = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));

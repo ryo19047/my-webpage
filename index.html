@@ -144,6 +144,20 @@
       border: 0;
     }
 
+    .tab-shell {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .tab-radio {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      left: -9999px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
     .tab-nav {
       display: flex;
       gap: 0.65rem;
@@ -151,7 +165,7 @@
       align-items: center;
     }
 
-    .tab-nav button {
+    .tab-nav label {
       flex: 1;
       border-radius: 18px;
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -163,17 +177,21 @@
       padding: 0.85rem 1rem;
       cursor: pointer;
       transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+      text-align: center;
+      user-select: none;
     }
 
-    .tab-nav button.active {
+    .tab-nav label:focus-visible {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 3px;
+    }
+
+    #tab-sns-control:checked ~ .tab-nav label[for="tab-sns-control"],
+    #tab-ranking-control:checked ~ .tab-nav label[for="tab-ranking-control"],
+    #tab-mypage-control:checked ~ .tab-nav label[for="tab-mypage-control"] {
       color: #05030c;
       border-color: transparent;
       background: linear-gradient(120deg, #ffce57, #8b7bff);
-    }
-
-    .tab-nav button:focus-visible {
-      outline: 2px solid var(--accent-2);
-      outline-offset: 3px;
     }
 
     .idea-button {
@@ -245,7 +263,9 @@
       gap: 2rem;
     }
 
-    .view.is-active {
+    #tab-sns-control:checked ~ #view-sns,
+    #tab-ranking-control:checked ~ #view-ranking,
+    #tab-mypage-control:checked ~ #view-mypage {
       display: grid;
     }
 
@@ -924,168 +944,174 @@
       </div>
     </section>
 
-    <nav class="panel tab-nav" role="tablist" aria-label="Night Shelfのパート切り替え">
-      <button type="button" class="active" data-view-button="sns" id="tab-sns" role="tab" aria-controls="view-sns" aria-selected="true" tabindex="0">書評SNS</button>
-      <button type="button" data-view-button="ranking" id="tab-ranking" role="tab" aria-controls="view-ranking" aria-selected="false" tabindex="-1">ランキング</button>
-      <button type="button" data-view-button="mypage" id="tab-mypage" role="tab" aria-controls="view-mypage" aria-selected="false" tabindex="-1">マイページ</button>
-    </nav>
+    <section class="tab-shell">
+      <input type="radio" name="view-tab" id="tab-sns-control" class="tab-radio" checked />
+      <input type="radio" name="view-tab" id="tab-ranking-control" class="tab-radio" />
+      <input type="radio" name="view-tab" id="tab-mypage-control" class="tab-radio" />
 
-    <div class="view is-active" data-view-panel="sns" id="view-sns" role="tabpanel" aria-labelledby="tab-sns">
-      <div class="grid">
-        <section class="panel">
-          <h2>最新レビュー</h2>
-          <small>※ 誤情報を見つけた場合はコメント欄で根拠を添えて知らせてください。</small>
-          <div id="review-feed" class="feed" aria-live="polite"></div>
-        </section>
+      <nav class="panel tab-nav" role="tablist" aria-label="Night Shelfのパート切り替え">
+        <label id="tab-sns-label" for="tab-sns-control" data-view-label="sns" role="tab" aria-controls="view-sns" aria-selected="true" tabindex="0">書評SNS</label>
+        <label id="tab-ranking-label" for="tab-ranking-control" data-view-label="ranking" role="tab" aria-controls="view-ranking" aria-selected="false" tabindex="0">ランキング</label>
+        <label id="tab-mypage-label" for="tab-mypage-control" data-view-label="mypage" role="tab" aria-controls="view-mypage" aria-selected="false" tabindex="0">マイページ</label>
+      </nav>
 
-        <section class="panel">
-          <h2>レビューを追加</h2>
-          <form id="review-form">
-            <div class="book-search">
-              <label>
-                <span>まず書名を検索して選択してください *</span>
-                <input type="search" id="book-search" placeholder="例: サピエンス全史" autocomplete="off" />
-              </label>
-              <ul id="search-results" class="search-results" aria-live="polite"></ul>
-              <p id="search-status" class="search-status"></p>
-            </div>
-            <label>
-              <span>本のタイトル *</span>
-              <input type="text" name="title" id="book-title" placeholder="書名検索から自動入力" required readonly />
-            </label>
-            <label>
-              <span>ハンドルネーム (任意)</span>
-              <input type="text" name="alias" id="book-alias" placeholder="未入力なら匿名になります" />
-            </label>
-            <label>
-              <span>星評価 (5段階) *</span>
-              <div class="rating-control" role="radiogroup" aria-label="星評価">
-                <button type="button" data-rating-button="1" aria-label="1星">★</button>
-                <button type="button" data-rating-button="2" aria-label="2星">★</button>
-                <button type="button" data-rating-button="3" aria-label="3星">★</button>
-                <button type="button" data-rating-button="4" aria-label="4星">★</button>
-                <button type="button" data-rating-button="5" aria-label="5星">★</button>
+      <div class="view" data-view-panel="sns" id="view-sns" role="tabpanel" aria-labelledby="tab-sns-label">
+        <div class="grid">
+          <section class="panel">
+            <h2>最新レビュー</h2>
+            <small>※ 誤情報を見つけた場合はコメント欄で根拠を添えて知らせてください。</small>
+            <div id="review-feed" class="feed" aria-live="polite"></div>
+          </section>
+
+          <section class="panel">
+            <h2>レビューを追加</h2>
+            <form id="review-form">
+              <div class="book-search">
+                <label>
+                  <span>まず書名を検索して選択してください *</span>
+                  <input type="search" id="book-search" placeholder="例: サピエンス全史" autocomplete="off" />
+                </label>
+                <ul id="search-results" class="search-results" aria-live="polite"></ul>
+                <p id="search-status" class="search-status"></p>
               </div>
-            </label>
-            <label>
-              <span>コメント *</span>
-              <textarea name="comment" id="book-comment" placeholder="本当に心を動かしたポイントを書いてください" required></textarea>
-            </label>
-            <button class="submit" type="submit">レビューを投稿</button>
-            <p class="helper">※ 書誌情報に誤りがあった場合はコミュニティの判断で非公開になることがあります。</p>
-            <div id="form-status" class="form-status" aria-live="polite"></div>
-          </form>
+              <label>
+                <span>本のタイトル *</span>
+                <input type="text" name="title" id="book-title" placeholder="書名検索から自動入力" required readonly />
+              </label>
+              <label>
+                <span>ハンドルネーム (任意)</span>
+                <input type="text" name="alias" id="book-alias" placeholder="未入力なら匿名になります" />
+              </label>
+              <label>
+                <span>星評価 (5段階) *</span>
+                <div class="rating-control" role="radiogroup" aria-label="星評価">
+                  <button type="button" data-rating-button="1" aria-label="1星">★</button>
+                  <button type="button" data-rating-button="2" aria-label="2星">★</button>
+                  <button type="button" data-rating-button="3" aria-label="3星">★</button>
+                  <button type="button" data-rating-button="4" aria-label="4星">★</button>
+                  <button type="button" data-rating-button="5" aria-label="5星">★</button>
+                </div>
+              </label>
+              <label>
+                <span>コメント *</span>
+                <textarea name="comment" id="book-comment" placeholder="本当に心を動かしたポイントを書いてください" required></textarea>
+              </label>
+              <button class="submit" type="submit">レビューを投稿</button>
+              <p class="helper">※ 書誌情報に誤りがあった場合はコミュニティの判断で非公開になることがあります。</p>
+              <div id="form-status" class="form-status" aria-live="polite"></div>
+            </form>
+          </section>
+        </div>
+      </div>
+
+      <div class="view" data-view-panel="ranking" id="view-ranking" role="tabpanel" aria-labelledby="tab-ranking-label">
+        <section class="panel ranking-panel">
+          <div class="section-heading">
+            <span>ランキング</span>
+            <h2>いま注目されている本</h2>
+          </div>
+          <ol class="ranking-list">
+            <li class="ranking-item">
+              <div class="rank-index">1</div>
+              <div>
+                <strong>サピエンス全史</strong>
+                <span>週内レビュー 42件 / 平均4.8</span>
+              </div>
+              <div class="trend-chip up">+5</div>
+            </li>
+            <li class="ranking-item">
+              <div class="rank-index">2</div>
+              <div>
+                <strong>罪と罰</strong>
+                <span>週内レビュー 35件 / 平均4.9</span>
+              </div>
+              <div class="trend-chip up">+2</div>
+            </li>
+            <li class="ranking-item">
+              <div class="rank-index">3</div>
+              <div>
+                <strong>ハチドリのひとしずく</strong>
+                <span>週内レビュー 29件 / 平均4.2</span>
+              </div>
+              <div class="trend-chip new">NEW</div>
+            </li>
+            <li class="ranking-item">
+              <div class="rank-index">4</div>
+              <div>
+                <strong>金閣寺</strong>
+                <span>週内レビュー 24件 / 平均4.5</span>
+              </div>
+              <div class="trend-chip">=</div>
+            </li>
+          </ol>
         </section>
       </div>
-    </div>
 
-    <div class="view" data-view-panel="ranking" id="view-ranking" role="tabpanel" aria-labelledby="tab-ranking">
-      <section class="panel ranking-panel">
-        <div class="section-heading">
-          <span>ランキング</span>
-          <h2>いま注目されている本</h2>
-        </div>
-        <ol class="ranking-list">
-          <li class="ranking-item">
-            <div class="rank-index">1</div>
-            <div>
-              <strong>サピエンス全史</strong>
-              <span>週内レビュー 42件 / 平均4.8</span>
-            </div>
-            <div class="trend-chip up">+5</div>
-          </li>
-          <li class="ranking-item">
-            <div class="rank-index">2</div>
-            <div>
-              <strong>罪と罰</strong>
-              <span>週内レビュー 35件 / 平均4.9</span>
-            </div>
-            <div class="trend-chip up">+2</div>
-          </li>
-          <li class="ranking-item">
-            <div class="rank-index">3</div>
-            <div>
-              <strong>ハチドリのひとしずく</strong>
-              <span>週内レビュー 29件 / 平均4.2</span>
-            </div>
-            <div class="trend-chip new">NEW</div>
-          </li>
-          <li class="ranking-item">
-            <div class="rank-index">4</div>
-            <div>
-              <strong>金閣寺</strong>
-              <span>週内レビュー 24件 / 平均4.5</span>
-            </div>
-            <div class="trend-chip">=</div>
-          </li>
-        </ol>
-      </section>
-    </div>
-
-    <div class="view" data-view-panel="mypage" id="view-mypage" role="tabpanel" aria-labelledby="tab-mypage">
-      <section class="panel mypage-panel">
-        <div class="section-heading">
-          <span>マイページ</span>
-          <h2>自分のペースで棚を育てる</h2>
-        </div>
-        <p class="mypage-intro personal-note" id="profile-note">まだメモは登録されていません。今日の読書テーマを書き残してみませんか？</p>
-        <div class="mypage-actions">
-          <form class="input-panel" id="note-form">
-            <h3>今日のメモ</h3>
-            <label>
-              <span>気になるテーマや気分</span>
-              <textarea id="note-input" placeholder="例: 旅エッセイと翻訳詩を行き来したい"></textarea>
-            </label>
-            <button type="submit">メモを更新</button>
-            <p class="form-helper" id="note-status" aria-live="polite"></p>
-          </form>
-          <form class="input-panel" id="stat-form">
-            <h3>自分の指標を追加</h3>
-            <label>
-              <span>指標タイトル *</span>
-              <input type="text" id="stat-label" placeholder="例: 読書連続日数" required />
-            </label>
-            <div class="inline-inputs">
+      <div class="view" data-view-panel="mypage" id="view-mypage" role="tabpanel" aria-labelledby="tab-mypage-label">
+        <section class="panel mypage-panel">
+          <div class="section-heading">
+            <span>マイページ</span>
+            <h2>自分のペースで棚を育てる</h2>
+          </div>
+          <p class="mypage-intro personal-note" id="profile-note">まだメモは登録されていません。今日の読書テーマを書き残してみませんか？</p>
+          <div class="mypage-actions">
+            <form class="input-panel" id="note-form">
+              <h3>今日のメモ</h3>
               <label>
-                <span>値 *</span>
-                <input type="number" id="stat-value" min="0" placeholder="例: 12" required />
+                <span>気になるテーマや気分</span>
+                <textarea id="note-input" placeholder="例: 旅エッセイと翻訳詩を行き来したい"></textarea>
               </label>
+              <button type="submit">メモを更新</button>
+              <p class="form-helper" id="note-status" aria-live="polite"></p>
+            </form>
+            <form class="input-panel" id="stat-form">
+              <h3>自分の指標を追加</h3>
               <label>
-                <span>一言メモ (任意)</span>
-                <input type="text" id="stat-note" placeholder="例: 夜更かし2日め" />
+                <span>指標タイトル *</span>
+                <input type="text" id="stat-label" placeholder="例: 読書連続日数" required />
               </label>
-            </div>
-            <button type="submit">指標を保存</button>
-            <p class="form-helper" id="stat-status" aria-live="polite"></p>
-          </form>
-          <form class="input-panel" id="shelf-form">
-            <h3>自分だけの本棚</h3>
-            <label>
-              <span>本棚タイトル *</span>
-              <input type="text" id="shelf-title" placeholder="例: 深夜に読み返すエッセイ" required />
-            </label>
-            <div class="inline-inputs">
+              <div class="inline-inputs">
+                <label>
+                  <span>値 *</span>
+                  <input type="number" id="stat-value" min="0" placeholder="例: 12" required />
+                </label>
+                <label>
+                  <span>一言メモ (任意)</span>
+                  <input type="text" id="stat-note" placeholder="例: 夜更かし2日め" />
+                </label>
+              </div>
+              <button type="submit">指標を保存</button>
+              <p class="form-helper" id="stat-status" aria-live="polite"></p>
+            </form>
+            <form class="input-panel" id="shelf-form">
+              <h3>自分だけの本棚</h3>
               <label>
-                <span>登録冊数 *</span>
-                <input type="number" id="shelf-total" min="0" placeholder="例: 12" required />
+                <span>本棚タイトル *</span>
+                <input type="text" id="shelf-title" placeholder="例: 深夜に読み返すエッセイ" required />
               </label>
+              <div class="inline-inputs">
+                <label>
+                  <span>登録冊数 *</span>
+                  <input type="number" id="shelf-total" min="0" placeholder="例: 12" required />
+                </label>
+                <label>
+                  <span>レビュー済み冊数 *</span>
+                  <input type="number" id="shelf-reviewed" min="0" placeholder="例: 4" required />
+                </label>
+              </div>
               <label>
-                <span>レビュー済み冊数 *</span>
-                <input type="number" id="shelf-reviewed" min="0" placeholder="例: 4" required />
+                <span>メモ (任意)</span>
+                <textarea id="shelf-note" placeholder="進捗や気になったポイントを書き残せます"></textarea>
               </label>
-            </div>
-            <label>
-              <span>メモ (任意)</span>
-              <textarea id="shelf-note" placeholder="進捗や気になったポイントを書き残せます"></textarea>
-            </label>
-            <button type="submit">本棚を追加</button>
-            <p class="form-helper" id="shelf-status" aria-live="polite"></p>
-          </form>
-        </div>
-        <div class="mypage-grid" id="personal-stats"></div>
-        <div class="shelf-list" id="personal-shelves"></div>
-      </section>
-    </div>
+              <button type="submit">本棚を追加</button>
+              <p class="form-helper" id="shelf-status" aria-live="polite"></p>
+            </form>
+          </div>
+          <div class="mypage-grid" id="personal-stats"></div>
+          <div class="shelf-list" id="personal-shelves"></div>
+        </section>
+      </div>
+    </section>
 
     <footer>© <span id="footer-year">2024</span> Night Shelf — 読んだ人が責任を持って語る書評SNS</footer>
   </div>
@@ -1099,8 +1125,8 @@
     const searchResults = document.getElementById('search-results');
     const searchStatus = document.getElementById('search-status');
     const titleInput = document.getElementById('book-title');
-    const viewButtons = Array.from(document.querySelectorAll('[data-view-button]'));
-    const viewPanels = Array.from(document.querySelectorAll('[data-view-panel]'));
+    const tabRadios = Array.from(document.querySelectorAll('.tab-radio'));
+    const tabLabels = Array.from(document.querySelectorAll('[data-view-label]'));
     const ideaToggle = document.getElementById('idea-toggle');
     const ideaPanel = document.getElementById('idea-panel');
     const noteForm = document.getElementById('note-form');
@@ -1467,82 +1493,94 @@
       });
     }
 
-    function activateView(target) {
-      viewPanels.forEach(panel => {
-        const isActive = panel.dataset.viewPanel === target;
-        panel.classList.toggle('is-active', isActive);
-      });
-
-      viewButtons.forEach(button => {
-        const isActive = button.dataset.viewButton === target;
-        button.classList.toggle('active', isActive);
-        button.setAttribute('aria-selected', String(isActive));
-        button.setAttribute('tabindex', isActive ? '0' : '-1');
+    function syncTabLabels(activeRadioId) {
+      tabLabels.forEach(label => {
+        const isActive = label.getAttribute('for') === activeRadioId;
+        label.setAttribute('aria-selected', String(isActive));
       });
     }
 
-    viewButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        activateView(button.dataset.viewButton);
+    tabLabels.forEach(label => {
+      label.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        const targetId = label.getAttribute('for');
+        const targetRadio = document.getElementById(targetId);
+        if (targetRadio) {
+          targetRadio.checked = true;
+          targetRadio.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       });
     });
 
-    feed.addEventListener('submit', (event) => {
-      if (!event.target.classList.contains('comment-form')) return;
-      event.preventDefault();
-      const formEl = event.target;
-      const reviewId = formEl.dataset.reviewId;
-      const alias = formEl.querySelector('[name="comment-alias"]').value.trim();
-      const text = formEl.querySelector('[name="comment-body"]').value.trim();
-
-      if (!text) return;
-
-      const targetReview = reviews.find(r => r.id === reviewId);
-      if (!targetReview) return;
-
-      targetReview.comments.unshift({
-        id: generateId('c'),
-        alias,
-        text
+    tabRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          syncTabLabels(radio.id);
+        }
       });
-
-      renderReviews();
     });
 
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const title = form.querySelector('#book-title').value.trim();
-      const alias = form.querySelector('#book-alias').value.trim();
-      const comment = form.querySelector('#book-comment').value.trim();
+    if (feed) {
+      feed.addEventListener('submit', (event) => {
+        if (!event.target.classList.contains('comment-form')) return;
+        event.preventDefault();
+        const formEl = event.target;
+        const reviewId = formEl.dataset.reviewId;
+        const alias = formEl.querySelector('[name="comment-alias"]').value.trim();
+        const text = formEl.querySelector('[name="comment-body"]').value.trim();
 
-      if (!title || !comment || currentRating === 0) {
-        statusEl.textContent = 'タイトル、コメント、星評価は必須です。';
-        return;
-      }
+        if (!text) return;
 
-      if (!selectedBook || selectedBook.title !== title) {
-        statusEl.textContent = '検索候補から書名を選択して確定してください。';
-        return;
-      }
+        const targetReview = reviews.find(r => r.id === reviewId);
+        if (!targetReview) return;
 
-      reviews.unshift({
-        id: generateId(),
-        title,
-        alias,
-        rating: currentRating,
-        comment,
-        tags: [`#ISBN:${selectedBook.id}`, '#ユーザー投稿'],
-        comments: []
+        targetReview.comments.unshift({
+          id: generateId('c'),
+          alias,
+          text
+        });
+
+        renderReviews();
       });
+    }
 
-      renderReviews();
+    if (form) {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const title = form.querySelector('#book-title').value.trim();
+        const alias = form.querySelector('#book-alias').value.trim();
+        const comment = form.querySelector('#book-comment').value.trim();
 
-      form.reset();
-      updateRatingUI(0);
-      resetSearchState();
-      statusEl.textContent = '投稿しました。確認後に公開されます。';
-      setTimeout(() => (statusEl.textContent = ''), 2500);
-    });
+        if (!title || !comment || currentRating === 0) {
+          statusEl.textContent = 'タイトル、コメント、星評価は必須です。';
+          return;
+        }
+
+        if (!selectedBook || selectedBook.title !== title) {
+          statusEl.textContent = '検索候補から書名を選択して確定してください。';
+          return;
+        }
+
+        reviews.unshift({
+          id: generateId(),
+          title,
+          alias,
+          rating: currentRating,
+          comment,
+          tags: [`#ISBN:${selectedBook.id}`, '#ユーザー投稿'],
+          comments: []
+        });
+
+        renderReviews();
+
+        form.reset();
+        updateRatingUI(0);
+        resetSearchState();
+        statusEl.textContent = '投稿しました。確認後に公開されます。';
+        setTimeout(() => (statusEl.textContent = ''), 2500);
+      });
+    }
 
     function setIdeaPanel(open) {
       if (!ideaPanel || !ideaToggle) return;
@@ -1647,12 +1685,7 @@
       footerYear.textContent = new Date().getFullYear();
     }
 
-    const footerYear = document.getElementById('footer-year');
-    if (footerYear) {
-      footerYear.textContent = new Date().getFullYear();
-    }
-
-    activateView('sns');
+    syncTabLabels('tab-sns-control');
     setIdeaPanel(false);
     renderReviews();
     renderPersonalNote();

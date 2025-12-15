@@ -1144,7 +1144,7 @@
     const personalStats = [];
     const personalShelves = [];
 
-    const catalog = [
+    const localCatalog = [
       {
         id: '9784309226710',
         title: 'サピエンス全史',
@@ -1183,6 +1183,8 @@
       }
     ];
 
+    let searchAbortController = null;
+
     function resetSearchState() {
       selectedBook = null;
       if (titleInput) titleInput.value = '';
@@ -1191,42 +1193,109 @@
       if (searchStatus) searchStatus.textContent = '書名を入力すると出版社・著者付きの候補が表示されます。';
     }
 
-    function renderSearchList(keyword) {
+    function createSearchListItem(book) {
+      const item = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.bookId = book.id || book.isbn || book.title;
+      button.dataset.bookTitle = book.title || '';
+      button.dataset.bookAuthor = book.author || '';
+      button.dataset.bookPublisher = book.publisher || '';
+      button.innerHTML = `<strong>${book.title}</strong><span>${book.author || '著者情報なし'} / ${book.publisher || '出版社不明'}</span>`;
+      item.appendChild(button);
+      return item;
+    }
+
+    function renderSearchResults(list) {
+      if (!searchResults) return;
+      searchResults.innerHTML = '';
+      list.forEach(book => {
+        searchResults.appendChild(createSearchListItem(book));
+      });
+    }
+
+    function filterLocalCatalog(keyword) {
+      const normalized = keyword.toLowerCase();
+      return localCatalog.filter(book => {
+        const target = `${book.title}${book.author}${book.publisher}`.toLowerCase();
+        return target.includes(normalized);
+      });
+    }
+
+    async function fetchBooksFromApi(keyword) {
+      if (searchAbortController) {
+        searchAbortController.abort();
+      }
+      searchAbortController = new AbortController();
+      const endpoint = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(keyword)}&maxResults=6&printType=books`;
+      const response = await fetch(endpoint, { signal: searchAbortController.signal });
+      if (!response.ok) {
+        throw new Error('検索に失敗しました');
+      }
+      const data = await response.json();
+      const items = (data.items || []).map(item => {
+        const info = item.volumeInfo || {};
+        const identifiers = info.industryIdentifiers || [];
+        const isbn = identifiers.find(id => id.type && id.identifier)?.identifier || item.id;
+        return {
+          id: isbn,
+          title: info.title || 'タイトル不明',
+          author: Array.isArray(info.authors) ? info.authors.join(' / ') : '著者情報なし',
+          publisher: info.publisher || '出版社不明'
+        };
+      }).filter(entry => entry.title);
+      return items;
+    }
+
+    async function handleBookSearch(keyword) {
       if (!searchResults) return;
       const normalized = keyword.trim();
+      selectedBook = null;
+      if (titleInput) titleInput.value = '';
       searchResults.innerHTML = '';
+
       if (!normalized) {
-        resetSearchState();
+        searchStatus.textContent = '書名を入力すると出版社・著者付きの候補が表示されます。';
         return;
       }
 
-      const matches = catalog.filter(book => {
-        const target = `${book.title}${book.author}`.toLowerCase();
-        return target.includes(normalized.toLowerCase());
-      }).slice(0, 6);
+      if (normalized.length < 2) {
+        searchStatus.textContent = 'あと1文字以上入力すると検索できます。';
+        return;
+      }
 
-      if (matches.length === 0) {
+      searchStatus.textContent = '検索中です...';
+      try {
+        const remoteResults = await fetchBooksFromApi(normalized);
+        if (remoteResults.length > 0) {
+          renderSearchResults(remoteResults);
+          searchStatus.textContent = `${remoteResults.length}件ヒットしました。タイトルをクリックして確定してください。`;
+          return;
+        }
+
+        const fallback = filterLocalCatalog(normalized);
+        if (fallback.length > 0) {
+          renderSearchResults(fallback);
+          searchStatus.textContent = `API結果なし。手元データから${fallback.length}件ヒットしました。`;
+          return;
+        }
+
         searchStatus.textContent = '一致する書籍が見つかりませんでした。別のキーワードを試してください。';
-        return;
+      } catch (error) {
+        if (error.name === 'AbortError') return;
+        const fallback = filterLocalCatalog(normalized);
+        if (fallback.length > 0) {
+          renderSearchResults(fallback);
+          searchStatus.textContent = `オンライン検索に失敗しました。手元データから${fallback.length}件ヒットしました。`;
+        } else {
+          searchStatus.textContent = '検索に失敗しました。ネットワーク状態を確認のうえ、再度お試しください。';
+        }
       }
-
-      matches.forEach(book => {
-        const item = document.createElement('li');
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.dataset.bookId = book.id;
-        button.innerHTML = `<strong>${book.title}</strong><span>${book.author} / ${book.publisher}</span>`;
-        item.appendChild(button);
-        searchResults.appendChild(item);
-      });
-      searchStatus.textContent = `${matches.length}件ヒットしました。タイトルをクリックして確定してください。`;
     }
 
     if (searchInput) {
       searchInput.addEventListener('input', (event) => {
-        selectedBook = null;
-        if (titleInput) titleInput.value = '';
-        renderSearchList(event.target.value);
+        handleBookSearch(event.target.value);
       });
     }
 
@@ -1234,13 +1303,18 @@
       searchResults.addEventListener('click', (event) => {
         const button = event.target.closest('button[data-book-id]');
         if (!button) return;
-        const book = catalog.find(entry => entry.id === button.dataset.bookId);
-        if (!book) return;
+        const book = {
+          id: button.dataset.bookId,
+          title: button.dataset.bookTitle,
+          author: button.dataset.bookAuthor,
+          publisher: button.dataset.bookPublisher
+        };
+        if (!book.title) return;
         selectedBook = book;
         titleInput.value = book.title;
         searchInput.value = book.title;
         searchResults.innerHTML = '';
-        searchStatus.textContent = `${book.title}（${book.author}）を選択済み。`;
+        searchStatus.textContent = `${book.title}（${book.author || '著者情報なし'}）を選択済み。`;
       });
     }
 

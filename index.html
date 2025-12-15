@@ -863,6 +863,49 @@
       cursor: pointer;
     }
 
+    .firebase-post {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .firebase-post textarea {
+      min-height: 100px;
+    }
+
+    .firebase-post button {
+      justify-self: start;
+      border-radius: 999px;
+      border: none;
+      padding: 0.7rem 1.4rem;
+      font-weight: 600;
+      font-family: "Space Grotesk", sans-serif;
+      background: linear-gradient(120deg, #ffce57, #8b7bff);
+      color: #05030c;
+      cursor: pointer;
+    }
+
+    .firebase-list {
+      margin: 1.5rem 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .firebase-list li {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.9rem 1rem;
+      display: grid;
+      gap: 0.3rem;
+    }
+
+    .firebase-list time {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
     form {
       display: grid;
       gap: 1rem;
@@ -1106,8 +1149,21 @@
             <div id="form-status" class="form-status" aria-live="polite"></div>
           </form>
         </section>
-        </div>
       </div>
+
+      <section class="panel">
+        <div class="section-heading">
+          <span>リアルタイム投稿</span>
+          <h2>Firestoreで共有するメモ</h2>
+        </div>
+        <div class="firebase-post">
+          <label for="reviewText">今の読書メモを一言で共有</label>
+          <textarea id="reviewText" placeholder="例: 金閣寺の描写が脳裏から離れない..."></textarea>
+          <button id="postBtn" type="button">投稿して共有</button>
+        </div>
+        <ul id="reviewList" class="firebase-list"></ul>
+      </section>
+    </div>
 
       <div class="view" data-view-panel="ranking" id="view-ranking" role="tabpanel" aria-labelledby="tab-ranking-label">
         <section class="panel ranking-panel">
@@ -2013,6 +2069,100 @@
         renderSelectedTags();
       }
     }
+  </script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      // TODO: Firebaseコンソールの値を貼る
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const reviewInput = document.getElementById('reviewText');
+    const postBtn = document.getElementById('postBtn');
+    const reviewList = document.getElementById('reviewList');
+
+    let currentUser = null;
+
+    function setButtonState(isPosting) {
+      if (!postBtn) return;
+      postBtn.disabled = isPosting;
+      postBtn.textContent = isPosting ? '投稿中...' : '投稿して共有';
+    }
+
+    function renderReviewList(snapshot) {
+      if (!reviewList) return;
+      reviewList.innerHTML = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const li = document.createElement('li');
+        const text = document.createElement('p');
+        text.textContent = data.text || '';
+        const time = document.createElement('time');
+        const created = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+        time.textContent = created ? created.toLocaleString('ja-JP') : '投稿準備中...';
+        li.append(text, time);
+        reviewList.appendChild(li);
+      });
+      if (snapshot.size === 0) {
+        const empty = document.createElement('li');
+        empty.textContent = 'まだ投稿はありません。最初のメモを残してみましょう。';
+        reviewList.appendChild(empty);
+      }
+    }
+
+    async function handlePost() {
+      if (!reviewInput) return;
+      const text = reviewInput.value.trim();
+      if (!text || !currentUser) return;
+      setButtonState(true);
+      try {
+        await addDoc(collection(db, 'reviews'), {
+          text,
+          createdAt: serverTimestamp(),
+          uid: currentUser.uid
+        });
+        reviewInput.value = '';
+      } catch (error) {
+        console.error('投稿に失敗しました', error);
+      } finally {
+        setButtonState(false);
+      }
+    }
+
+    if (postBtn) {
+      postBtn.addEventListener('click', handlePost);
+    }
+
+    signInAnonymously(auth).catch((error) => {
+      console.error('匿名認証に失敗しました', error);
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+    });
+
+    const reviewsQuery = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'));
+    onSnapshot(reviewsQuery, renderReviewList);
   </script>
 </body>
 </html>

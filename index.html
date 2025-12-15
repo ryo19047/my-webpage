@@ -124,6 +124,187 @@
       overflow: hidden;
     }
 
+    .section-heading {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-heading span {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .feature-card {
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 1.25rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .feature-card strong {
+      font-size: 1.05rem;
+    }
+
+    .feature-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .feature-card em {
+      font-style: normal;
+      color: var(--accent-2);
+      font-size: 0.9rem;
+      letter-spacing: 0.08em;
+    }
+
+    .ranking-panel {
+      background: linear-gradient(135deg, rgba(139, 123, 255, 0.12), rgba(5, 3, 12, 0.9));
+    }
+
+    .ranking-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .ranking-item {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.2rem;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .rank-index {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    .ranking-item strong {
+      display: block;
+      font-size: 1.05rem;
+    }
+
+    .ranking-item span {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .trend-chip {
+      border-radius: 999px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .trend-chip.up {
+      color: #0fd976;
+      border-color: #0fd976;
+    }
+
+    .trend-chip.new {
+      color: var(--accent-2);
+      border-color: var(--accent-2);
+    }
+
+    .mypage-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .stat-card {
+      border-radius: 18px;
+      padding: 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .stat-card small {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat-card strong {
+      font-size: 1.8rem;
+      font-family: "Space Grotesk", sans-serif;
+    }
+
+    .shelf-list {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .shelf-card {
+      display: grid;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .shelf-card h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .shelf-progress {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .shelf-progress span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(120deg, var(--accent-2), var(--accent));
+    }
+
+    .shelf-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
     .panel h2 {
       margin: 0 0 1rem;
       font-size: 1.4rem;
@@ -515,6 +696,117 @@
         </form>
       </section>
     </div>
+
+    <section class="panel">
+      <div class="section-heading">
+        <span>書評SNS</span>
+        <h2>Night Shelfでできる3つのこと</h2>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <em>匿名×一次ソース</em>
+          <strong>書誌情報付きの短評投稿</strong>
+          <p>ISBNでひも付けられたレビューだけが投稿され、推測や引用不明の噂は流れません。一次情報を大事にする人のためのタイムラインです。</p>
+        </article>
+        <article class="feature-card">
+          <em>対話で磨く</em>
+          <strong>コメントのやり取り</strong>
+          <p>レビューごとに根拠を添えたコメントが集まり、誤情報を見つけたらすぐに指摘できます。納得感のある議論だけが残ります。</p>
+        </article>
+        <article class="feature-card">
+          <em>テーマで追う</em>
+          <strong>タグベースの棚づくり</strong>
+          <p>#歴史、#翻訳もの など自分の視点で並べたタグをフォローするだけで、興味の近い人の書評が集まります。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel ranking-panel">
+      <div class="section-heading">
+        <span>ランキング</span>
+        <h2>いま注目されている本</h2>
+      </div>
+      <ol class="ranking-list">
+        <li class="ranking-item">
+          <div class="rank-index">1</div>
+          <div>
+            <strong>サピエンス全史</strong>
+            <span>週内レビュー 42件 / 平均4.8</span>
+          </div>
+          <div class="trend-chip up">+5</div>
+        </li>
+        <li class="ranking-item">
+          <div class="rank-index">2</div>
+          <div>
+            <strong>罪と罰</strong>
+            <span>週内レビュー 35件 / 平均4.9</span>
+          </div>
+          <div class="trend-chip up">+2</div>
+        </li>
+        <li class="ranking-item">
+          <div class="rank-index">3</div>
+          <div>
+            <strong>ハチドリのひとしずく</strong>
+            <span>週内レビュー 29件 / 平均4.2</span>
+          </div>
+          <div class="trend-chip new">NEW</div>
+        </li>
+        <li class="ranking-item">
+          <div class="rank-index">4</div>
+          <div>
+            <strong>金閣寺</strong>
+            <span>週内レビュー 24件 / 平均4.5</span>
+          </div>
+          <div class="trend-chip">=</div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="panel mypage-panel">
+      <div class="section-heading">
+        <span>マイページ</span>
+        <h2>自分のペースで棚を育てる</h2>
+      </div>
+      <div class="mypage-grid">
+        <div class="stat-card">
+          <small>読書連続日数</small>
+          <strong>18</strong>
+          <span>ナイトモード達成まであと 12日</span>
+        </div>
+        <div class="stat-card">
+          <small>公開レビュー</small>
+          <strong>57</strong>
+          <span>レビュー草稿 3件が承認待ち</span>
+        </div>
+        <div class="stat-card">
+          <small>フォロー中の棚</small>
+          <strong>11</strong>
+          <span>文学系 6 / ノンフィクション 5</span>
+        </div>
+      </div>
+      <div class="shelf-list">
+        <article class="shelf-card">
+          <h3>深夜に読み返すエッセイ</h3>
+          <div class="shelf-progress" aria-label="進捗 70%">
+            <span style="width: 70%"></span>
+          </div>
+          <div class="shelf-meta">
+            <span>登録 14冊</span>
+            <span>レビュー済み 10冊</span>
+          </div>
+        </article>
+        <article class="shelf-card">
+          <h3>翻訳で読む現代詩</h3>
+          <div class="shelf-progress" aria-label="進捗 45%">
+            <span style="width: 45%"></span>
+          </div>
+          <div class="shelf-meta">
+            <span>登録 9冊</span>
+            <span>レビュー済み 4冊</span>
+          </div>
+        </article>
+      </div>
+    </section>
 
     <footer>© 2024 Night Shelf — 読んだ人が責任を持って語る書評SNS</footer>
   </div>
